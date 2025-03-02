@@ -114,7 +114,7 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 
 	payloadResponse := &models.ResponseDetails{
 		Status:  response.StatusCode,
-		Body:    util.TruncateStringWithEllipsis(respBody, this.BodyMemoryLimit.ToBytes()),
+		Body:    respBody,
 		Headers: response.Header,
 	}
 

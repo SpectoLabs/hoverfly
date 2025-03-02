@@ -76,6 +76,43 @@ func Test_Journal_NewEntry_AddsJournalEntryToEntries(t *testing.T) {
 	Expect(entries[0].Latency).To(BeNumerically("<", 1))
 }
 
+func Test_Journal_NewEntryWithMemoryLimit_TruncateBody(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+	unit.BodyMemoryLimit = 15
+
+	request, _ := http.NewRequest("GET", "http://hoverfly.io", io.NopCloser(bytes.NewBufferString("large request body")),)
+
+	nowTime := time.Now()
+
+	_, err := unit.NewEntry(request, &http.Response{
+		StatusCode: 200,
+		Body:       io.NopCloser(bytes.NewBufferString("large response body")),
+		Header: http.Header{
+			"test-header": []string{
+				"one", "two",
+			},
+		},
+	}, "test-mode", nowTime)
+	Expect(err).To(BeNil())
+
+	journalView, err := unit.GetEntries(0, 25, nil, nil, "")
+	entries := journalView.Journal
+	Expect(err).To(BeNil())
+
+	Expect(entries).ToNot(BeNil())
+	Expect(entries).To(HaveLen(1))
+
+	Expect(*entries[0].Request.Method).To(Equal("GET"))
+	Expect(*entries[0].Request.Destination).To(Equal("hoverfly.io"))
+	Expect(*entries[0].Request.Body).To(Equal("large reques..."))
+
+	Expect(entries[0].Response.Status).To(Equal(200))
+	Expect(entries[0].Response.Body).To(Equal("large respon..."))
+}
+
+
 func Test_Journal_UpdateEntry_AddsRemotePostServeActionToJournalEntry(t *testing.T) {
 	RegisterTestingT(t)
 
