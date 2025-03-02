@@ -64,6 +64,7 @@ var logOutputFlags arrayFlags
 var responseBodyFilesPath string
 var responseBodyFilesAllowedOriginFlags arrayFlags
 var journalIndexingKeyFlags arrayFlags
+var journalBodyMemoryLimit util.MemorySize
 
 const boltBackend = "boltdb"
 const inmemoryBackend = "memory"
@@ -210,6 +211,7 @@ func main() {
 	flag.StringVar(&responseBodyFilesPath, "response-body-files-path", "", "When a response contains a relative bodyFile, it will be resolved against this absolute path (default is CWD)")
 	flag.Var(&responseBodyFilesAllowedOriginFlags, "response-body-files-allow-origin", "When a response contains a url in bodyFile, it will be loaded only if the origin is allowed")
 	flag.Var(&journalIndexingKeyFlags, "journal-indexing-key", "Key to setup indexing on journal")
+	flag.Var(&journalBodyMemoryLimit, "journal-body-memory-limit", "Memory size limit for a request or response body in the journal (e.g., '128KB', '2MB'). Memory size is unbounded by default")
 
 	flag.Parse()
 
@@ -232,6 +234,10 @@ func main() {
 
 	if *journalSize < 0 {
 		*journalSize = 0
+	}
+
+	if journalBodyMemoryLimit > 0 {
+		log.Infof("Journal body memory limit is set to: %s", journalBodyMemoryLimit.String())
 	}
 
 	if *logsSize < 0 {
