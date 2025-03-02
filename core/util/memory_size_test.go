@@ -35,10 +35,11 @@ func TestMemorySize_Set(t *testing.T) {
 		var ms MemorySize
 
 		// Test inputs with invalid values
-		Expect(ms.Set("10XYZ")).To(Not(BeNil())) // Unknown unit
-		Expect(ms.Set("ABC")).To(Not(BeNil()))   // Non-numeric input
-		Expect(ms.Set("")).To(Not(BeNil()))      // Empty input
-		Expect(ms.Set("-5MB")).To(Not(BeNil()))  // Negative value
+		Expect(ms.Set("10XYZ")).To(MatchError("invalid memory size: 10XYZ"))
+		Expect(ms.Set("ABC")).To(MatchError("invalid memory size: ABC"))
+		Expect(ms.Set("")).To(MatchError("invalid memory size: "))
+		Expect(ms.Set("-5MB")).To(MatchError("memory size must be greater than 0"))
+		Expect(ms).To(Equal(MemorySize(0)))
 	})
 
 	t.Run("boundary cases", func(t *testing.T) {
