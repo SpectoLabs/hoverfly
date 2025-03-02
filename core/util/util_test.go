@@ -433,6 +433,12 @@ func TestTruncateStringWithEllipsis(t *testing.T) {
 			expected: "Hello",
 		},
 		{
+			name:     "Zero max size",
+			input:    "Hello",
+			maxSize:  0,
+			expected: "...",
+		},
+		{
 			name:     "Truncate with ellipsis",
 			input:    "Hello, World!",
 			maxSize:  10,
@@ -473,7 +479,7 @@ func TestTruncateStringWithEllipsis(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			g := NewWithT(t)
-			result := truncateStringWithEllipsis(test.input, test.maxSize)
+			result := TruncateStringWithEllipsis(test.input, test.maxSize)
 			g.Expect(result).To(Equal(test.expected), "Expected %q but got %q for input %q with maxSize %d", test.expected, result, test.input, test.maxSize)
 		})
 	}

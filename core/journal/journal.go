@@ -107,9 +107,14 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 
 	respBody, _ := util.GetResponseBody(response)
 
+	if this.BodyMemoryLimit.ToBytes() > 0 {
+		payloadRequest.Body = util.TruncateStringWithEllipsis(payloadRequest.Body, this.BodyMemoryLimit.ToBytes())
+		respBody = util.TruncateStringWithEllipsis(respBody, this.BodyMemoryLimit.ToBytes())
+	}
+
 	payloadResponse := &models.ResponseDetails{
 		Status:  response.StatusCode,
-		Body:    respBody,
+		Body:    util.TruncateStringWithEllipsis(respBody, this.BodyMemoryLimit.ToBytes()),
 		Headers: response.Header,
 	}
 
