@@ -38,8 +38,13 @@ func (m *MemorySize) Set(value string) error {
 	}
 
 	size, err := strconv.Atoi(value)
-	if err != nil || size < 0 {
+
+	if err != nil {
 		return fmt.Errorf("invalid memory size: %s", value)
+	}
+
+	if size <= 0 {
+		return fmt.Errorf("memory size must be greater than 0")
 	}
 
 	*m = MemorySize(size * multiplier)
