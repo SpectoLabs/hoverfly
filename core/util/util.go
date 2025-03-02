@@ -558,8 +558,12 @@ func ResolveAndValidatePath(absBasePath, relativePath string) (string, error) {
 	return resolvedPath, nil
 }
 
-func truncateStringWithEllipsis(input string, maxSize int) string {
-	ellipsis := "..."
+func TruncateStringWithEllipsis(input string, maxSize int) string {
+	ellipsis := "..." // 3 bytes in UTF-8
+
+	if maxSize <= 3 {
+		return ellipsis
+	}
 
 	if len(input) <= maxSize{
 		return input
