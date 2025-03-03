@@ -80,7 +80,7 @@ func Test_Journal_NewEntryWithMemoryLimit_TruncateBody(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := journal.NewJournal()
-	unit.BodyMemoryLimit = 15
+	unit.BodySizeLimit = 15
 
 	request, _ := http.NewRequest("GET", "http://hoverfly.io", io.NopCloser(bytes.NewBufferString("large request body")),)
 

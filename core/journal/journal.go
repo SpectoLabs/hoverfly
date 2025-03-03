@@ -39,11 +39,11 @@ type PostServeActionEntry struct {
 }
 
 type Journal struct {
-	entries         []JournalEntry
-	Indexes         []Index
-	EntryLimit      int
-	BodyMemoryLimit util.MemorySize
-	mutex           sync.Mutex
+	entries       []JournalEntry
+	Indexes       []Index
+	EntryLimit    int
+	BodySizeLimit util.MemorySize
+	mutex         sync.Mutex
 }
 
 func NewJournal() *Journal {
@@ -107,9 +107,9 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 
 	respBody, _ := util.GetResponseBody(response)
 
-	if this.BodyMemoryLimit.ToBytes() > 0 {
-		payloadRequest.Body = util.TruncateStringWithEllipsis(payloadRequest.Body, this.BodyMemoryLimit.ToBytes())
-		respBody = util.TruncateStringWithEllipsis(respBody, this.BodyMemoryLimit.ToBytes())
+	if this.BodySizeLimit.ToBytes() > 0 {
+		payloadRequest.Body = util.TruncateStringWithEllipsis(payloadRequest.Body, this.BodySizeLimit.ToBytes())
+		respBody = util.TruncateStringWithEllipsis(respBody, this.BodySizeLimit.ToBytes())
 	}
 
 	payloadResponse := &models.ResponseDetails{

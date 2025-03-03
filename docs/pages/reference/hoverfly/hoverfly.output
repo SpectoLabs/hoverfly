@@ -47,11 +47,12 @@ Usage of hoverfly:
         Generate CA certificate and private key for MITM
   -import value
         Import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'
+  -journal-body-size-limit value
+        Set the memory size limit for a request or response body in the journal (e.g., '128KB', '2MB'). Defaults to unbounded
+  -journal-indexing-key value
+        Key to setup indexing on journal
   -journal-size int
         Set the size of request/response journal (default 1000)
-  -journal-indexing-key string
-        Specify the index key using which you want to index journal. Index shares same syntax as the one for templating, such as Request.QueryParam.myParam or Request.Header.X-Header-Id.[1].
-        It is used for extracting the data from the journal entry to use as a key for that entry.
   -key string
         Private key of the CA used to sign MITM certificates
   -listen-on-host string
@@ -72,38 +73,34 @@ Usage of hoverfly:
         Set the amount of logs to be stored in memory (default 1000)
   -metrics
         Enable metrics logging to stdout
-  -post-serve-action string
-        Set local post serve action by passing the action name, binary and the path of the action script and delay in Ms separated by space.
-        (i.e. -post-serve-action "<action name> python3 <script path to load> 1000" -post-serve-action "<action name> python3 <script path to load> 3000")
-        Set remote post serve action by passing the action name, remote host and delay in Ms separated by space.
-         (i.e. -post-serve-action "<action name> <http/https remote host> 1000" -post-serve-action "<action name> <http/https remote host> 3000")
-        We can set multiple post serve actions and use in our simulation schema file.
   -middleware string
         Set middleware by passing the name of the binary and the path of the middleware script separated by space. (i.e. '-middleware "python script.py"')
   -modify
         Start Hoverfly in modify mode - applies middleware (required) to both outgoing and incoming HTTP traffic
   -no-import-check
         Skip duplicate request check when importing simulations
+  -pac-file string
+        Path to the pac file to be imported on startup
   -password string
         Password for new user
   -password-hash string
         Password hash for new user instead of password
   -plain-http-tunneling
         Use plain http tunneling to host with non-443 port
+  -post-serve-action value
+        Set post serve action by passing the action name, binary and the path of the action script and delay in Ms separated by space. (i.e. i.e. '-post-serve-action "webhook python script.py 2000"')
   -pp string
         Proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)
   -response-body-files-allow-origin value
         When a response contains a url in bodyFile, it will be loaded only if the origin is allowed
   -response-body-files-path string
-        When a response contains a relative bodyFile, it will be resolved against this path (default is CWD)
+        When a response contains a relative bodyFile, it will be resolved against this absolute path (default is CWD)
   -spy
         Start Hoverfly in spy mode, similar to simulate but calls real server when cache miss
   -synthesize
         Start Hoverfly in synthesize mode (middleware is required)
-  -templating-data-source
-        Set templating CSV data source by passing data source name and CSV data file path separated by space.
-        (i.e. -templating-data-source "<data source name> <file path>")
-        We can set multiple template CSV data source and then we can query data by using templating csv helper method
+  -templating-data-source value
+        Set template data source (i.e. '-templating-data-source "<datasource name> <file path>"')
   -tls-verification
         Turn on/off tls verification for outgoing requests (will not try to verify certificates) (default true)
   -upstream-proxy string
@@ -115,3 +112,4 @@ Usage of hoverfly:
         Get the version of hoverfly
   -webserver
         Start Hoverfly in webserver mode (simulate mode)
+
