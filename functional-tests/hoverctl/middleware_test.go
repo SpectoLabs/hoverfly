@@ -16,6 +16,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 	var (
 		hoverfly *functional_tests.Hoverfly
+		remoteMiddleware *functional_tests.Hoverfly
 	)
 
 	Describe("with a running hoverfly which has middleware configured", func() {
@@ -30,6 +31,9 @@ var _ = Describe("When I use hoverctl", func() {
 
 		AfterEach(func() {
 			hoverfly.Stop()
+			if remoteMiddleware != nil {
+				remoteMiddleware.Stop()
+			}
 		})
 
 		It("I can get the hoverfly's middleware", func() {
@@ -122,18 +126,37 @@ var _ = Describe("When I use hoverctl", func() {
 			Expect(output).To(ContainSubstring("Remote: " + middlewareServer.URL))
 		})
 
-		It("I cannae set the hoverfly's middleware when specifying non-existing file", func() {
+		It("I cannot set the hoverfly's middleware when specifying non-existing file", func() {
 			output := functional_tests.Run(hoverctlBinary, "middleware", "--binary", "python", "--script", "testdata/not_a_real_file.fake")
 
 			Expect(output).To(ContainSubstring("File not found: testdata/not_a_real_file.fake"))
 		})
 
-		It("I cannae set the hoverfly's middleware when specifying non-existing remote middleware", func() {
-			output := functional_tests.Run(hoverctlBinary, "middleware", "--remote", "http://specto-fda13.web.app/404/nothere")
+		It("I cannot set the hoverfly's middleware when specifying non-existing remote middleware", func() {
+			remoteMiddleware = functional_tests.NewHoverfly()
+			remoteMiddleware.Start("-webserver")
+			remoteMiddleware.SetMode("simulate")
+			remoteMiddleware.ImportSimulation(`{
+				"data": {
+					"pairs": [
+						{
+							"request": {},
+							"response": {
+								"status": 404
+							}
+						}
+					]
+				},
+				"meta": {
+					"schemaVersion": "v5"
+				}
+			}`)
+
+			output := functional_tests.Run(hoverctlBinary, "middleware", "--remote", "http://localhost:" + remoteMiddleware.GetProxyPort())
 
 			Expect(output).To(ContainSubstring("Could not set middleware, it may have failed the test"))
 			Expect(output).To(ContainSubstring("Error when communicating with remote middleware: received 404"))
-			Expect(output).To(ContainSubstring("URL: http://specto-fda13.web.app/404/nothere"))
+			Expect(output).To(ContainSubstring("URL: http://localhost"))
 			Expect(output).To(ContainSubstring("STDIN:"))
 			Expect(output).To(ContainSubstring(`{"response":{"status":200,"body":"ok","encodedBody":false,"headers":{"test_header":["true"]}},"request":{"path":"/","method":"GET","destination":"www.test.com","scheme":"","query":"","formData":null,"body":"","headers":{"test_header":["true"]}}}`))
 		})
