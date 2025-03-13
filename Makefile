@@ -41,6 +41,7 @@ build:
 	go build -ldflags "-X main.hoverctlVersion=$(GIT_TAG_NAME)" -o ../target/hoverctl
 
 build-ui:
+	go install github.com/rakyll/statik@latest
 	wget https://github.com/SpectoLabs/hoverfly-ui/releases/download/$(GIT_TAG_NAME)/$(GIT_TAG_NAME).zip
 	unzip $(GIT_TAG_NAME).zip -d hoverfly-ui
 	cd core && \
