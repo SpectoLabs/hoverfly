@@ -12,7 +12,7 @@ project = 'Hoverfly'
 copyright = '2025 Hoverfly Cloud'
 author = 'Hoverfly Cloud'
 
-version = 'v1.10.13'
+version = 'v1.11.0'
 # The full version, including alpha/beta/rc tags.
 release = version
 
