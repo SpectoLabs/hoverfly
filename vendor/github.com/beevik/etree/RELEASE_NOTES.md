@@ -1,3 +1,16 @@
+Release 1.5.0
+=============
+
+**Changes**
+
+* Added `Element` function `CreateChild`, which calls a continuation function
+  after creating and adding a child element.
+
+**Fixes**
+
+* Removed a potential conflict between two `ReadSettings` values. When
+  `AttrSingleQuote` is true, `CanonicalAttrVal` is forced to be false.
+
 Release 1.4.1
 =============
 
