@@ -124,13 +124,13 @@ hoverctl configuration file.
 				hasLogOutputFile = true
 			}
 			if logOutput != "console" && logOutput != "file" {
-				handleIfError(fmt.Errorf("Unknown logs-output value: " + logOutput))
+				handleIfError(fmt.Errorf("unknown logs-output value: %s", logOutput))
 			}
 		}
 		if !hasLogOutputFile {
 			cmd.Flags().Visit(func(f *pflag.Flag) {
 				if f.Name == "logs-file" {
-					handleIfError(fmt.Errorf("Flag -logs-file is not allowed unless -logs-output is set to 'file'."))
+					handleIfError(fmt.Errorf("flag -logs-file is not allowed unless -logs-output is set to 'file'"))
 				}
 			})
 		}
