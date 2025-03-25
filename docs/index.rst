@@ -7,9 +7,9 @@
 .. image:: https://circleci.com/gh/SpectoLabs/hoverfly.svg?style=shield
     :target: https://circleci.com/gh/SpectoLabs/hoverfly
 
-.. image:: https://badges.gitter.im/SpectoLabs/hoverfly.svg
-    :target: https://gitter.im/SpectoLabs/hoverfly
-
+.. image:: https://img.shields.io/github/discussions/spectolabs/hoverfly
+   :alt: GitHub Discussions
+   :target: https://github.com/SpectoLabs/hoverfly/discussions
 
 |
 
