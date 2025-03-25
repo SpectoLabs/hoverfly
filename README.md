@@ -2,7 +2,8 @@
 
 [![Circle CI][CircleCI-Image]][CircleCI-Url] 
 [![Documentation Status](https://readthedocs.org/projects/hoverfly/badge/?version=latest)](http://hoverfly.readthedocs.io/en/latest/?badge=latest)
-[![Join the chat at https://gitter.im/SpectoLabs/hoverfly](https://badges.gitter.im/SpectoLabs/hoverfly.svg)](https://gitter.im/SpectoLabs/hoverfly?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![GitHub Discussions](https://img.shields.io/github/discussions/spectolabs/hoverfly)](https://github.com/SpectoLabs/hoverfly/discussions)
+
 
 ## API simulations for development and testing
 
@@ -23,7 +24,6 @@ Hoverfly is developed and maintained by [iOCO Solutions](https://ioco.uk/).
 
 * [Download and installation](https://hoverfly.readthedocs.io/en/latest/pages/introduction/downloadinstallation.html)
 * [Read the docs](https://hoverfly.readthedocs.io)
-* [Join the mailing list](https://groups.google.com/a/specto.io/forum/#!forum/hoverfly)
 
 ## Hoverfly Cloud
 
