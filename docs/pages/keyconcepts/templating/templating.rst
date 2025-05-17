@@ -182,7 +182,7 @@ Reading from a CSV Data Source
 
 You can read data from a CSV data source in a number of ways.
 
-The most basic is to use the ``csv`` function to return the value of one field (selected-column) given a field name to search (column-name) and 
+The most basic is to use the ``csv`` function to return the value of one field (selected-column) given a field name to search (column-name) and
 a value to search for in that field (query-value). Of course the query-value would normally be pulled from the request.
 
 .. code:: handlebars
@@ -245,14 +245,14 @@ To return all the data from the csv as an array of maps, you use the ``csvAsMap`
 .. code:: handlebars
 
     {{csvAsMap '(data-source-name)' }}
-    
 
-To return filtered data from the csv as an array of maps, you use the ``csvMatchingRows``function. 
+
+To return filtered data from the csv as an array of maps, you use the ``csvMatchingRows``function.
 (Note that you would need to wrap this in an #each block. See examples below.):
 
 .. code:: handlebars
 
-    {{csvMatchingRows '(data-source-name)' '(column-name)' '(query-value)' '(selected-column)'}}
+    {{csvMatchingRows '(data-source-name)' '(column-name)' '(query-value)'}}
 
 To return all the data from the csv as an array arrays, you use the ``csvAsArray`` function.
 (Note that you would need to wrap this in an #each block. See examples below.):
@@ -261,7 +261,7 @@ To return all the data from the csv as an array arrays, you use the ``csvAsArray
 
     {{csvAsArray '(data-source-name)' }}
 
-To return filtered data from the csv as an array of maps using the SQL like dialect, you use the ``csvSqlCommand`` function. 
+To return filtered data from the csv as an array of maps using the SQL like dialect, you use the ``csvSqlCommand`` function.
 Again this needs to be wrapped in an #each block:
 
 .. code:: handlebars
@@ -401,8 +401,8 @@ To delete all the pets where the category is cats from the pets csv data store:
 ``{{ csvDeleteRows 'pets' 'category' 'cats' false }}``
 
 Note that the last parameter of "output-result" is a boolean. It is not enclosed in quotes. The function will return the number of rows
-affected which can either be suppressed by passing false to this parameter, or passed into another function if you need to make logical 
-decisions based on the number of rows affected by passing in true as the last parameter. If ``csvDeleteRows`` is not enclosed within another 
+affected which can either be suppressed by passing false to this parameter, or passed into another function if you need to make logical
+decisions based on the number of rows affected by passing in true as the last parameter. If ``csvDeleteRows`` is not enclosed within another
 function it will output the number of rows deleted to the template.
 
 ``{{#equal (csvDeleteRows 'pets' 'category' 'cats' true) '0'}}
@@ -423,8 +423,8 @@ Deleting data from a CSV Data Source using SQL like syntax
 Example:
 ``{{ csvSqlCommand "DELETE FROM pets WHERE id > '20'" }}``
 
-Calling the csvSqlCommand for Delete and Update commands will execute the statements without outputting anything to the template. 
-The rows affected will be logged for debugging purposes. 
+Calling the csvSqlCommand for Delete and Update commands will execute the statements without outputting anything to the template.
+The rows affected will be logged for debugging purposes.
 
 
 
@@ -473,7 +473,7 @@ Joins across different data sources are not supported.
 Counting the rows in a CSV Data Source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can return the number of rows in a csv dataset using ``csvCountRows``. 
+You can return the number of rows in a csv dataset using ``csvCountRows``.
 This will be 1 less than the number of rows as the first row contains the column names.
 
 .. code:: handlebars

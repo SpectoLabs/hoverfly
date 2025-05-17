@@ -421,9 +421,17 @@ func jsonPath(query, toMatch string) interface{} {
 	return arrayData
 }
 
-// isScientific checks if a string is in scientific notation (e.g., "1.349599e+37")
+// containScientificNotation checks if a string is in scientific notation (e.g., "1.349599e+37")
 func containScientificNotation(value string) bool {
-	return strings.Contains(value, "e") || strings.Contains(value, "E")
+	// Scientific notation pattern:
+	// - Optional sign at start (+/-)
+	// - One or more digits (optionally with decimal point)
+	// - e or E
+	// - Optional sign (+/-)
+	// - One or more digits
+	pattern := `^[+-]?\d*\.?\d+[eE][+-]?\d+$`
+	match, _ := regexp.MatchString(pattern, value)
+	return match
 }
 
 func convertToPlainNotation(scientific string) (string, bool) {
