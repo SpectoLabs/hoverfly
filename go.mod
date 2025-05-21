@@ -9,13 +9,13 @@ require (
 	github.com/SpectoLabs/goxml2json v0.0.0-20240121223617-8e03292c14ea
 	github.com/SpectoLabs/raymond v2.0.3-0.20240827093205-07f3a7bebd7d+incompatible
 	github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496
-	github.com/beevik/etree v1.5.0
+	github.com/beevik/etree v1.5.1
 	github.com/boltdb/bolt v1.3.1
 	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/codegangsta/negroni v1.0.0
 	github.com/dghubble/sling v1.4.2
 	github.com/dsnet/compress v0.0.1
-	github.com/go-playground/validator/v10 v10.25.0
+	github.com/go-playground/validator/v10 v10.26.0
 	github.com/go-zoo/bone v1.3.0
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/gorilla/mux v1.8.1
@@ -27,7 +27,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.36.3
+	github.com/onsi/gomega v1.37.0
 	github.com/pborman/uuid v1.2.1
 	github.com/phayes/freeport v0.0.0-20220201140144-74d24b5ae9f5
 	github.com/rakyll/statik v0.1.7
