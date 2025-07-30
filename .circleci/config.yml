@@ -86,7 +86,7 @@ jobs:
       - run:
           name: Install github-release
           command: |
-            go install github.com/aktau/github-release@latest
+            go install github.com/github-release/github-release@latest
       - run:
           name: Build cross platform releases
           command: |
