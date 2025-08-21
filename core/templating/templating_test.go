@@ -917,6 +917,22 @@ func Test_ApplyTemplate_setStatusCode_should_handle_nil_response(t *testing.T) {
 	Expect(template).To(Equal(""))
 }
 
+func Test_ApplyTemplate_setHeader(t *testing.T) {
+	RegisterTestingT(t)
+
+	templator := templating.NewTemplator()
+
+	template, err := templator.ParseTemplate(`{{ setHeader "X-Test-Header" "HeaderValue" }}`)
+	Expect(err).To(BeNil())
+
+	response := &models.ResponseDetails{Headers: map[string][]string{}}
+	result, err := templator.RenderTemplate(template, &models.RequestDetails{}, response, &models.Literals{}, &models.Variables{}, make(map[string]string))
+
+	Expect(err).To(BeNil())
+	Expect(result).To(Equal(""))
+	Expect(response.Headers).To(HaveKeyWithValue("X-Test-Header", []string{"HeaderValue"}))
+}
+
 func toInterfaceSlice(arguments []string) []interface{} {
 	argumentsArray := make([]interface{}, len(arguments))
 

@@ -105,6 +105,7 @@ func NewEnrichedTemplator(journal *journal.Journal) *Templator {
 	helperMethodMap["journal"] = t.parseJournalBasedOnIndex
 	helperMethodMap["hasJournalKey"] = t.hasJournalKey
 	helperMethodMap["setStatusCode"] = t.setStatusCode
+	helperMethodMap["setHeader"] = t.setHeader
 	helperMethodMap["sum"] = t.sum
 	helperMethodMap["add"] = t.add
 	helperMethodMap["subtract"] = t.subtract
@@ -146,10 +147,19 @@ func (t *Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models
 
 	ctx := t.NewTemplatingData(requestDetails, literals, vars, state)
 	result, err := tpl.Exec(ctx)
-	if err == nil {
-		statusCode, ok := ctx.InternalVars["statusCode"]
-		if ok && response != nil {
+	if err == nil && response != nil {
+		// Set status code if present
+		if statusCode, ok := ctx.InternalVars["statusCode"]; ok {
 			response.Status = statusCode.(int)
+		}
+		// Set headers if present
+		if setHeaders, ok := ctx.InternalVars["setHeaders"]; ok {
+			if response.Headers == nil {
+				response.Headers = make(map[string][]string)
+			}
+			for k, v := range setHeaders.(map[string][]string) {
+				response.Headers[k] = v
+			}
 		}
 	}
 	return result, err
