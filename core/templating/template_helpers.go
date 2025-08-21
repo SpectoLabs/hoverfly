@@ -498,6 +498,24 @@ func (t templateHelpers) setStatusCode(statusCode string, options *raymond.Optio
 	return ""
 }
 
+func (t templateHelpers) setHeader(headerName string, headerValue string, options *raymond.Options) string {
+	if headerName == "" {
+		log.Error("header name cannot be empty")
+		return ""
+	}
+	internalVars := options.ValueFromAllCtx("InternalVars").(map[string]interface{})
+	var headers map[string][]string
+	if h, ok := internalVars["setHeaders"]; ok {
+		headers = h.(map[string][]string)
+	} else {
+		headers = make(map[string][]string)
+	}
+	// Replace or add the header
+	headers[headerName] = []string{headerValue}
+	internalVars["setHeaders"] = headers
+	return ""
+}
+
 func (t templateHelpers) sum(numbers []string, format string) string {
 	return sumNumbers(numbers, format)
 }
