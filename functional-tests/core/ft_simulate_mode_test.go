@@ -21,7 +21,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 	BeforeEach(func() {
 		hoverfly = functional_tests.NewHoverfly()
-		hoverfly.Start()
+		hoverfly.Start("-enable-middleware-api")
 		hoverfly.SetMode("simulate")
 	})
 

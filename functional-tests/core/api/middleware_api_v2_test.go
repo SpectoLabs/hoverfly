@@ -18,7 +18,7 @@ var _ = Describe("/api/v2/hoverfly/middleware", func() {
 
 	BeforeEach(func() {
 		hoverfly = functional_tests.NewHoverfly()
-		hoverfly.Start()
+		hoverfly.Start("-enable-middleware-api")
 	})
 
 	AfterEach(func() {
