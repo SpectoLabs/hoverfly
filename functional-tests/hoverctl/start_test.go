@@ -1,9 +1,12 @@
 package hoverctl_suite
 
 import (
-	"github.com/antonholmquist/jason"
+	"io"
 	"io/ioutil"
 	"strconv"
+	"strings"
+
+	"github.com/antonholmquist/jason"
 
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
@@ -327,7 +330,21 @@ var _ = Describe("hoverctl `start`", func() {
 		})
 	})
 
-	Context("with pac-file", func() {
+ Context("with enable-middleware-api", func() {
+ 		It("enables middleware API when flag is provided", func() {
+ 			output := functional_tests.Run(hoverctlBinary, "start", "--enable-middleware-api")
+ 			Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+ 			// Attempt to set middleware via Admin API should be allowed (200)
+ 			req := sling.New().Put("http://localhost:8888/api/v2/hoverfly/middleware")
+ 			// Use a valid echo middleware that reads from STDIN and outputs the JSON payload unchanged
+ 			req.Body(strings.NewReader(`{"binary":"ruby", "script":"#!/usr/bin/env ruby\n# encoding: utf-8\nwhile payload = STDIN.gets\nnext unless payload\n\nSTDOUT.puts payload\nend"}`))
+ 			res := functional_tests.DoRequest(req)
+ 			Expect(res.StatusCode).To(Equal(200))
+ 		})
+ 	})
+
+ 	Context("with pac-file", func() {
 		BeforeEach(func() {
 		})
 
@@ -338,7 +355,7 @@ var _ = Describe("hoverctl `start`", func() {
 
 			response := functional_tests.DoRequest(sling.New().Get("http://localhost:8888/api/v2/hoverfly/pac"))
 			Expect(response.StatusCode).To(Equal(200))
-			responseBody, err := ioutil.ReadAll(response.Body)
+			responseBody, err := io.ReadAll(response.Body)
 			Expect(err).To(BeNil())
 			Expect(string(responseBody)).To(ContainSubstring(`function FindProxyForURL(url, host) {`))
 		})

@@ -78,6 +78,9 @@ hoverctl configuration file.
 
 		target.Simulations, _ = cmd.Flags().GetStringSlice("import")
 
+		// Feature flags
+		target.EnableMiddlewareAPI, _ = cmd.Flags().GetBool("enable-middleware-api")
+
 		if pacFileLocation, _ := cmd.Flags().GetString("pac-file"); pacFileLocation != "" {
 
 			pacFileData, err := configuration.ReadFile(pacFileLocation)
@@ -199,4 +202,7 @@ func init() {
 	startCmd.Flags().StringSlice("logs-output", []string{}, "Locations for log output, \"console\"(default) or \"file\"")
 	startCmd.Flags().String("logs-file", "", "Log file name. Use \"hoverfly-<target name>.log\" if not provided")
 	startCmd.Flags().String("log-level", "info", "Set log level (panic, fatal, error, warn, info or debug)")
+
+	// Feature flags
+	startCmd.Flags().Bool("enable-middleware-api", false, "Enable the admin API to set middleware (PUT /api/v2/hoverfly/middleware)")
 }
