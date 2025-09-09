@@ -1,10 +1,11 @@
 package hoverfly
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/cors"
 	"os"
 	"strconv"
 	"sync"
+
+	"github.com/SpectoLabs/hoverfly/core/cors"
 
 	"strings"
 
@@ -51,6 +52,9 @@ type Configuration struct {
 
 	ResponsesBodyFilesPath           string
 	ResponsesBodyFilesAllowedOrigins []string
+
+	// Feature flags
+	EnableMiddlewareAPI bool
 
 	ProxyControlWG sync.WaitGroup
 

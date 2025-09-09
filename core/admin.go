@@ -99,7 +99,7 @@ func getAllHandlers(hoverfly *Hoverfly) []handlers.AdminHandler {
 		&v2.HoverflyHandler{Hoverfly: hoverfly},
 		&v2.HoverflyDestinationHandler{Hoverfly: hoverfly},
 		&v2.HoverflyModeHandler{Hoverfly: hoverfly},
-		&v2.HoverflyMiddlewareHandler{Hoverfly: hoverfly},
+		&v2.HoverflyMiddlewareHandler{Hoverfly: hoverfly, Enabled: hoverfly.Cfg.EnableMiddlewareAPI},
 		&v2.HoverflyUsageHandler{Hoverfly: hoverfly},
 		&v2.HoverflyVersionHandler{Hoverfly: hoverfly},
 		&v2.HoverflyUpstreamProxyHandler{Hoverfly: hoverfly},

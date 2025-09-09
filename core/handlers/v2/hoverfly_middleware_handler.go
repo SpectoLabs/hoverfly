@@ -16,6 +16,7 @@ type HoverflyMiddleware interface {
 
 type HoverflyMiddlewareHandler struct {
 	Hoverfly HoverflyMiddleware
+	Enabled  bool
 }
 
 func (this *HoverflyMiddlewareHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
@@ -24,10 +25,12 @@ func (this *HoverflyMiddlewareHandler) RegisterRoutes(mux *bone.Mux, am *handler
 		negroni.HandlerFunc(this.Get),
 	))
 
-	mux.Put("/api/v2/hoverfly/middleware", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(this.Put),
-	))
+	if this.Enabled {
+		mux.Put("/api/v2/hoverfly/middleware", negroni.New(
+			negroni.HandlerFunc(am.RequireTokenAuthentication),
+			negroni.HandlerFunc(this.Put),
+		))
+	}
 	mux.Options("/api/v2/hoverfly/middleware", negroni.New(
 		negroni.HandlerFunc(this.Options),
 	))
@@ -60,6 +63,10 @@ func (this *HoverflyMiddlewareHandler) Put(w http.ResponseWriter, req *http.Requ
 }
 
 func (this *HoverflyMiddlewareHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	w.Header().Add("Allow", "OPTIONS, GET, PUT")
+	allow := "OPTIONS, GET"
+	if this.Enabled {
+		allow += ", PUT"
+	}
+	w.Header().Add("Allow", allow)
 	handlers.WriteResponse(w, []byte(""))
 }

@@ -16,7 +16,7 @@ var _ = Describe("when I use hoverctl status", func() {
 
 		BeforeEach(func() {
 			hoverfly = functional_tests.NewHoverfly()
-			hoverfly.Start()
+			hoverfly.Start("-enable-middleware-api")
 
 			functional_tests.Run(hoverctlBinary, "targets", "update", "local", "--admin-port", hoverfly.GetAdminPort())
 		})

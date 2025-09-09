@@ -121,6 +121,9 @@ var (
 	cors          = flag.Bool("cors", false, "Enable CORS support")
 	noImportCheck = flag.Bool("no-import-check", false, "Skip duplicate request check when importing simulations")
 
+	// Feature flags
+	enableMiddlewareAPI = flag.Bool("enable-middleware-api", false, "Enable the admin API to set middleware (PUT /api/v2/hoverfly/middleware)")
+
 	pacFile = flag.String("pac-file", "", "Path to the pac file to be imported on startup")
 
 	clientAuthenticationDestination = flag.String("client-authentication-destination", "", "Regular expression of destination with client authentication")
@@ -402,6 +405,9 @@ func main() {
 		cfg.NoImportCheck = *noImportCheck
 		log.Info("Import check has been disabled")
 	}
+
+	// Feature flags
+	cfg.EnableMiddlewareAPI = *enableMiddlewareAPI
 
 	cfg.ClientAuthenticationDestination = *clientAuthenticationDestination
 	cfg.ClientAuthenticationClientCert = *clientAuthenticationClientCert

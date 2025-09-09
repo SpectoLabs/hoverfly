@@ -130,7 +130,7 @@ func Test_HoverflyMiddlewareHandler_Options_GetsOptions(t *testing.T) {
 	RegisterTestingT(t)
 
 	var stubHoverfly HoverflyMiddlewareStub
-	unit := HoverflyMiddlewareHandler{Hoverfly: &stubHoverfly}
+	unit := HoverflyMiddlewareHandler{Hoverfly: &stubHoverfly, Enabled: true}
 
 	request, err := http.NewRequest("OPTIONS", "/api/v2/hoverfly/middleware", nil)
 	Expect(err).To(BeNil())
