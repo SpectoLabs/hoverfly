@@ -74,6 +74,6 @@ By default, Hoverfly binds its Admin and Proxy ports to the loopback interface o
    - Run Hoverfly only on trusted/private networks.
    - Restrict access to the Admin API to trusted callers and networks (e.g., via firewalls, security groups, VPNs, reverse proxy ACLs).
    - Prefer binding to localhost unless there is a strong need to expose it, and scope exposure to the minimum required interfaces.
-   - Enable authentication if appropriate and avoid exposing the Admin port publicly.
+   - :ref:`proxyauth` if appropriate and avoid exposing the Admin port publicly.
 
 The guidance above applies whether you configure middleware as a local executable/script or as HTTP middleware.
