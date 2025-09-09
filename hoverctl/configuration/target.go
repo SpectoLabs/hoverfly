@@ -33,6 +33,9 @@ type Target struct {
 	ClientAuthenticationClientKey   string `yaml:",omitempty"`
 	ClientAuthenticationCACert      string `yaml:",omitempty"`
 
+	// Feature flags
+	EnableMiddlewareAPI bool `yaml:",omitempty"`
+
 	AuthEnabled bool
 	Username    string
 	Password    string
@@ -169,6 +172,11 @@ func (this Target) BuildFlags() Flags {
 		for _, val := range this.Simulations {
 			flags = append(flags, "-import="+val)
 		}
+	}
+
+	// Feature flags
+	if this.EnableMiddlewareAPI {
+		flags = append(flags, "-enable-middleware-api")
 	}
 
 	return flags
