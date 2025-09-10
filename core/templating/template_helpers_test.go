@@ -7,6 +7,18 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+// mockRaymondOptions is a minimal mock for raymond.Options for testing
+type mockRaymondOptions struct {
+	internalVars map[string]interface{}
+}
+
+func (m *mockRaymondOptions) ValueFromAllCtx(key string) interface{} {
+	if key == "InternalVars" {
+		return m.internalVars
+	}
+	return nil
+}
+
 func testNow() time.Time {
 	parsedTime, _ := time.Parse("2006-01-02T15:04:05Z", "2018-01-01T00:00:00Z")
 	return parsedTime
@@ -93,11 +105,20 @@ func Test_split(t *testing.T) {
 }
 
 func Test_concat(t *testing.T) {
+
 	RegisterTestingT(t)
 
 	unit := templateHelpers{}
 
 	Expect(unit.concat("one", " two")).To(Equal("one two"))
+}
+
+func Test_concatWithManyStrings(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := templateHelpers{}
+
+	Expect(unit.concat("one", " two", " three", " four")).To(Equal("one two three four"))
 }
 
 func Test_length(t *testing.T) {

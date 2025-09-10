@@ -80,6 +80,18 @@ func Test_ApplyTemplate_MatchingRowsCsvAndReturnMatchedString(t *testing.T) {
 	Expect(template).To(Equal(`Test2`))
 }
 
+func Test_ApplyTemplate_InitArray_ClearsArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(
+		&models.RequestDetails{},
+		make(map[string]string),
+		`{{addToArray 'myArray' 'one' false}}{{addToArray 'myArray' 'two' false}}{{addToArray 'myArray' 'three' false}}{{addToArray 'myArray' 'four' false}}{{addToArray 'myArray' 'five' false}}{{initArray 'myArray'}}{{addToArray 'myArray' 'six' false}}{{#each (getArray 'myArray')}}{{this}}{{/each}}`,
+	)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal("six"))
+}
 func Test_ApplyTemplate_MatchingRowsCsvMissingDataSource(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -915,6 +927,22 @@ func Test_ApplyTemplate_setStatusCode_should_handle_nil_response(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(template).To(Equal(""))
+}
+
+func Test_ApplyTemplate_setHeader(t *testing.T) {
+	RegisterTestingT(t)
+
+	templator := templating.NewTemplator()
+
+	template, err := templator.ParseTemplate(`{{ setHeader "X-Test-Header" "HeaderValue" }}`)
+	Expect(err).To(BeNil())
+
+	response := &models.ResponseDetails{Headers: map[string][]string{}}
+	result, err := templator.RenderTemplate(template, &models.RequestDetails{}, response, &models.Literals{}, &models.Variables{}, make(map[string]string))
+
+	Expect(err).To(BeNil())
+	Expect(result).To(Equal(""))
+	Expect(response.Headers).To(HaveKeyWithValue("X-Test-Header", []string{"HeaderValue"}))
 }
 
 func toInterfaceSlice(arguments []string) []interface{} {
