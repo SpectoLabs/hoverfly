@@ -11,7 +11,7 @@ Jinja2==3.1.6
 packaging==23.1
 pycparser==2.21
 Pygments==2.16.1
-requests==2.32.0
+requests==2.32.4
 six==1.16.0
 snowballstemmer==2.2.0
 Sphinx==5.3.0
