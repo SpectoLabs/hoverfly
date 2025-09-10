@@ -185,6 +185,9 @@ var _ = Describe("hoverctl `start`", func() {
 			response := functional_tests.DoRequest(sling.New().Get("http://localhost:8888/api/v2/hoverfly"))
 			Expect(response.StatusCode).To(Equal(401))
 
+			response = functional_tests.DoRequest(sling.New().Get("http://localhost:8888/api/v2/ws/logs"))
+			Expect(response.StatusCode).To(Equal(401))
+
 			response = functional_tests.DoRequest(sling.New().Post("http://localhost:8888/api/token-auth").BodyJSON(backends.User{
 				Username: functional_tests.HoverflyUsername,
 				Password: functional_tests.HoverflyPassword,

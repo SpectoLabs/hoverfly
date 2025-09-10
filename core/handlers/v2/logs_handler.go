@@ -39,7 +39,10 @@ func (this *LogsHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler)
 		negroni.HandlerFunc(this.Options),
 	))
 
-	mux.Get("/api/v2/ws/logs", http.HandlerFunc(this.GetWS))
+	mux.Get("/api/v2/ws/logs", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.Wrap(http.HandlerFunc(this.GetWS)),
+	))
 }
 
 func (this *LogsHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
