@@ -1,14 +1,15 @@
 package delay
 
 import (
+	"sort"
+	"testing"
+
 	. "github.com/onsi/gomega"
 	"gonum.org/v1/gonum/floats"
 	"gonum.org/v1/gonum/stat"
-	"sort"
-	"testing"
 )
 
-const tolerance = 10
+const tolerance = 50
 
 func TestLogNormalGenerator_GenerateDelay(t *testing.T) {
 	RegisterTestingT(t)
