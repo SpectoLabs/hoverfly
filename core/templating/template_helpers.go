@@ -116,8 +116,20 @@ func (t templateHelpers) split(target, separator string) []string {
 	return strings.Split(target, separator)
 }
 
-func (t templateHelpers) concat(val1, val2 string) string {
-	return val1 + val2
+// Concatenates any number of arguments together as strings.
+func (t templateHelpers) concat(args ...interface{}) string {
+	var parts []string
+	for _, arg := range args {
+		// If arg is a slice, flatten it
+		if s, ok := arg.([]interface{}); ok {
+			for _, v := range s {
+				parts = append(parts, fmt.Sprint(v))
+			}
+		} else {
+			parts = append(parts, fmt.Sprint(arg))
+		}
+	}
+	return strings.Join(parts, "")
 }
 
 func (t templateHelpers) isNumeric(stringToCheck string) bool {
@@ -498,6 +510,24 @@ func (t templateHelpers) setStatusCode(statusCode string, options *raymond.Optio
 	return ""
 }
 
+func (t templateHelpers) setHeader(headerName string, headerValue string, options *raymond.Options) string {
+	if headerName == "" {
+		log.Error("header name cannot be empty")
+		return ""
+	}
+	internalVars := options.ValueFromAllCtx("InternalVars").(map[string]interface{})
+	var headers map[string][]string
+	if h, ok := internalVars["setHeaders"]; ok {
+		headers = h.(map[string][]string)
+	} else {
+		headers = make(map[string][]string)
+	}
+	// Replace or add the header
+	headers[headerName] = []string{headerValue}
+	internalVars["setHeaders"] = headers
+	return ""
+}
+
 func (t templateHelpers) sum(numbers []string, format string) string {
 	return sumNumbers(numbers, format)
 }
@@ -546,6 +576,13 @@ func (t templateHelpers) addToArray(key string, value string, output bool, optio
 	} else {
 		return ""
 	}
+}
+
+// Initializes (clears) an array in the template context under the given key.
+func (t templateHelpers) initArray(key string, options *raymond.Options) string {
+	arrayData := options.ValueFromAllCtx("Kvs").(map[string]interface{})
+	arrayData[key] = []string{}
+	return ""
 }
 
 func (t templateHelpers) getArray(key string, options *raymond.Options) []string {

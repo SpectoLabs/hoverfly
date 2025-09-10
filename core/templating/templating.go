@@ -41,7 +41,6 @@ type Request struct {
 	Host       string
 }
 
-
 type Templator struct {
 	SupportedMethodMap map[string]interface{}
 	TemplateHelper     templateHelpers
@@ -62,7 +61,7 @@ func NewEnrichedTemplator(journal *journal.Journal) *Templator {
 		now:                time.Now,
 		fakerSource:        gofakeit.New(0),
 		TemplateDataSource: templateDataSource,
-		journal: journal,
+		journal:            journal,
 	}
 
 	helperMethodMap["now"] = t.nowHelper
@@ -105,11 +104,13 @@ func NewEnrichedTemplator(journal *journal.Journal) *Templator {
 	helperMethodMap["journal"] = t.parseJournalBasedOnIndex
 	helperMethodMap["hasJournalKey"] = t.hasJournalKey
 	helperMethodMap["setStatusCode"] = t.setStatusCode
+	helperMethodMap["setHeader"] = t.setHeader
 	helperMethodMap["sum"] = t.sum
 	helperMethodMap["add"] = t.add
 	helperMethodMap["subtract"] = t.subtract
 	helperMethodMap["multiply"] = t.multiply
 	helperMethodMap["divide"] = t.divide
+	helperMethodMap["initArray"] = t.initArray
 	helperMethodMap["addToArray"] = t.addToArray
 	helperMethodMap["getArray"] = t.getArray
 	helperMethodMap["putValue"] = t.putValue
@@ -146,10 +147,19 @@ func (t *Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models
 
 	ctx := t.NewTemplatingData(requestDetails, literals, vars, state)
 	result, err := tpl.Exec(ctx)
-	if err == nil {
-		statusCode, ok := ctx.InternalVars["statusCode"]
-		if ok && response != nil {
+	if err == nil && response != nil {
+		// Set status code if present
+		if statusCode, ok := ctx.InternalVars["statusCode"]; ok {
 			response.Status = statusCode.(int)
+		}
+		// Set headers if present
+		if setHeaders, ok := ctx.InternalVars["setHeaders"]; ok {
+			if response.Headers == nil {
+				response.Headers = make(map[string][]string)
+			}
+			for k, v := range setHeaders.(map[string][]string) {
+				response.Headers[k] = v
+			}
 		}
 	}
 	return result, err

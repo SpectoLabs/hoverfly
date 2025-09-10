@@ -49,7 +49,7 @@ Currently, you can get the following data from request to the response via templ
 Helper Methods
 --------------
 
-Additional data can come from helper methods. These are the ones Hoverfly currently support:
+Additional data can come from helper methods. These are the ones Hoverfly currently supports:
 
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | Description                                               | Example                                                   |  Result                                 |
@@ -529,13 +529,18 @@ In this case, you can use the internal key value data store. The following helpe
 +----------------------------+--------------------------------------------+-----------------------+
 | Get an entry               | ``{{ getValue 'id' }}``                    |  123                  |
 +----------------------------+--------------------------------------------+-----------------------+
-| Add a value to an arra     | ``{{ addToArray 'names' 'John' true }}``   |  John                 |
+| Add a value to an array    | ``{{ addToArray 'names' 'John' true }}``   |  John                 |
+| Get an array               | ``{{ getArray 'names' }}``                 |  ["John"]             |
+| Clear an array             | ``{{ initArray 'names' }}``                |  []                   |
 +----------------------------+--------------------------------------------+-----------------------+
 | Get an array               | ``{{ getArray 'names' }}``                 |  []string{"John"      |
 +----------------------------+--------------------------------------------+-----------------------+
 
+
 ``addToArray`` will create a new array if one doesn't exist. The boolean argument in ``putValue`` and ``addToArray``
 is used to control whether the set value is returned.
+
+``initArray`` will clear an existing array (set it to empty) or create a new empty array if it does not exist. This is useful for resetting arrays inside loops or before reusing them in a template.
 
 .. note::
 
@@ -601,7 +606,7 @@ You can use the following helper methods to join, split or replace string values
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | Description                                               | Example                                                   |  Result                                 |
 +===========================================================+===========================================================+=========================================+
-| String concatenate                                        | ``{{ concat 'bee' 'hive' }}``                             |  beehive                                |
+| String concatenate                                        | ``{{ concat 'bee' 'hive' 'buzz' }}``                       |  beehivebuzz                            |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | String splitting                                          | ``{{ split 'bee,hive' ',' }}``                            |  []string{"bee", "hive"}                |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
@@ -654,6 +659,51 @@ To learn about more advanced templating functionality, such as looping and condi
 
 Global Literals and Variables
 -----------------------------
+Setting properties on the response
+----------------------------------
+
+Hoverfly provides helper functions to set properties on the HTTP response directly from your templates. This allows you to dynamically control the status code and headers based on request data or logic in your template.
+
+Setting the Status Code
+~~~~~~~~~~~~~~~~~~~~~~~
+You can set the HTTP status code of the response using the ``setStatusCode`` helper. This is useful for conditional logic, such as returning a 404 if a resource is not found, or a 200 if an operation succeeds.
+
+.. code:: handlebars
+
+    {{ setStatusCode 404 }}
+
+You can use this helper inside conditional blocks:
+
+.. code:: handlebars
+
+    {{#equal (csvDeleteRows 'pets' 'category' 'cats' true) '0'}}
+        {{ setStatusCode 404 }}
+        {"Message":"Error no cats found"}
+    {{else}}
+        {{ setStatusCode 200 }}
+        {"Message":"All cats deleted"}
+    {{/equal}}
+
+If you provide an invalid status code (e.g., outside the range 100-599), it will be ignored.
+
+Setting Response Headers
+~~~~~~~~~~~~~~~~~~~~~~~
+You can set or override HTTP response headers using the ``setHeader`` helper. This is useful for adding custom headers, controlling caching, or setting content types dynamically.
+
+.. code:: handlebars
+
+    {{ setHeader "X-Custom-Header" "HeaderValue" }}
+
+You can use this helper multiple times to set different headers, or inside conditional blocks to set headers based on logic:
+
+.. code:: handlebars
+
+    {{ setHeader "Content-Type" "application/json" }}
+    {{ setHeader "X-Request-Id" (randomUuid) }}
+
+If the header already exists, it will be overwritten with the new value.
+
+Both helpers do not output anything to the template result; they only affect the response properties.
 You can define global literals and variables for templated response. This comes in handy when you
 have a lot of templated responses that share the same constant values or helper methods.
 
