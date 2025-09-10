@@ -687,7 +687,7 @@ You can use this helper inside conditional blocks:
 If you provide an invalid status code (e.g., outside the range 100-599), it will be ignored.
 
 Setting Response Headers
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 You can set or override HTTP response headers using the ``setHeader`` helper. This is useful for adding custom headers, controlling caching, or setting content types dynamically.
 
 .. code:: handlebars
