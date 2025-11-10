@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: cimg/go:1.25.1
+      - image: cimg/go:1.25.4
 
     environment:
       GOPATH: /home/circleci/go
@@ -32,7 +32,7 @@ jobs:
 
   deploy-master:
     docker:
-      - image: cimg/go:1.25.1
+      - image: cimg/go:1.25.4
 
     environment:
       GOPATH: /home/circleci/go
@@ -58,7 +58,7 @@ jobs:
 
   deploy-release:
     docker:
-      - image: cimg/go:1.25.1
+      - image: cimg/go:1.25.4
 
     environment:
       GOPATH: /home/circleci/go
