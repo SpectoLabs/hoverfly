@@ -90,7 +90,7 @@ func Test_ReconstructRequest_ShouldRecompressGzipBody(t *testing.T) {
 		Method:      "POST",
 		Destination: "test-destination.com",
 		Body:        "new request body here",
-		Headers: 	 map[string][]string{"Content-Encoding": {"gzip"}},
+		Headers:     map[string][]string{"Content-Encoding": {"gzip"}},
 	}
 	pair := models.RequestResponsePair{Request: request}
 

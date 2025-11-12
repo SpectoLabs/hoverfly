@@ -333,21 +333,21 @@ var _ = Describe("hoverctl `start`", func() {
 		})
 	})
 
- Context("with enable-middleware-api", func() {
- 		It("enables middleware API when flag is provided", func() {
- 			output := functional_tests.Run(hoverctlBinary, "start", "--enable-middleware-api")
- 			Expect(output).To(ContainSubstring("Hoverfly is now running"))
+	Context("with enable-middleware-api", func() {
+		It("enables middleware API when flag is provided", func() {
+			output := functional_tests.Run(hoverctlBinary, "start", "--enable-middleware-api")
+			Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
- 			// Attempt to set middleware via Admin API should be allowed (200)
- 			req := sling.New().Put("http://localhost:8888/api/v2/hoverfly/middleware")
- 			// Use a valid echo middleware that reads from STDIN and outputs the JSON payload unchanged
- 			req.Body(strings.NewReader(`{"binary":"ruby", "script":"#!/usr/bin/env ruby\n# encoding: utf-8\nwhile payload = STDIN.gets\nnext unless payload\n\nSTDOUT.puts payload\nend"}`))
- 			res := functional_tests.DoRequest(req)
- 			Expect(res.StatusCode).To(Equal(200))
- 		})
- 	})
+			// Attempt to set middleware via Admin API should be allowed (200)
+			req := sling.New().Put("http://localhost:8888/api/v2/hoverfly/middleware")
+			// Use a valid echo middleware that reads from STDIN and outputs the JSON payload unchanged
+			req.Body(strings.NewReader(`{"binary":"ruby", "script":"#!/usr/bin/env ruby\n# encoding: utf-8\nwhile payload = STDIN.gets\nnext unless payload\n\nSTDOUT.puts payload\nend"}`))
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+		})
+	})
 
- 	Context("with pac-file", func() {
+	Context("with pac-file", func() {
 		BeforeEach(func() {
 		})
 

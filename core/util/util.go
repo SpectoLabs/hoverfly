@@ -440,7 +440,7 @@ func convertToPlainNotation(scientific string) (string, bool) {
 		return scientific, false
 	}
 
-	return floatVal.Text('f', -1) , true
+	return floatVal.Text('f', -1), true
 }
 
 func xPath(query, toMatch string) string {
@@ -573,7 +573,7 @@ func TruncateStringWithEllipsis(input string, maxSize int) string {
 		return ellipsis
 	}
 
-	if len(input) <= maxSize{
+	if len(input) <= maxSize {
 		return input
 	}
 
@@ -586,4 +586,3 @@ func TruncateStringWithEllipsis(input string, maxSize int) string {
 
 	return truncated + ellipsis
 }
-

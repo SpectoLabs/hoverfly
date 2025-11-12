@@ -15,7 +15,7 @@ import (
 var _ = Describe("When I use hoverctl", func() {
 
 	var (
-		hoverfly *functional_tests.Hoverfly
+		hoverfly         *functional_tests.Hoverfly
 		remoteMiddleware *functional_tests.Hoverfly
 	)
 
@@ -152,7 +152,7 @@ var _ = Describe("When I use hoverctl", func() {
 				}
 			}`)
 
-			output := functional_tests.Run(hoverctlBinary, "middleware", "--remote", "http://localhost:" + remoteMiddleware.GetProxyPort())
+			output := functional_tests.Run(hoverctlBinary, "middleware", "--remote", "http://localhost:"+remoteMiddleware.GetProxyPort())
 
 			Expect(output).To(ContainSubstring("Could not set middleware, it may have failed the test"))
 			Expect(output).To(ContainSubstring("Error when communicating with remote middleware: received 404"))

@@ -1525,11 +1525,11 @@ func TestHoverfly_SetMultipleTemplateDataSource(t *testing.T) {
 
 	Expect(unit.templator.TemplateHelper.TemplateDataSource.GetAllDataSources()).ToNot(BeNil())
 
-	csv1, exists1:= unit.templator.TemplateHelper.TemplateDataSource.GetDataSource("test-csv1")
+	csv1, exists1 := unit.templator.TemplateHelper.TemplateDataSource.GetDataSource("test-csv1")
 	Expect(csv1).NotTo(BeNil())
 	Expect(exists1).To(BeTrue())
 
-	csv2, exists2:= unit.templator.TemplateHelper.TemplateDataSource.GetDataSource("test-csv2")
+	csv2, exists2 := unit.templator.TemplateHelper.TemplateDataSource.GetDataSource("test-csv2")
 	Expect(csv2).NotTo(BeNil())
 	Expect(exists2).To(BeTrue())
 

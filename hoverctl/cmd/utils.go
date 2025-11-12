@@ -55,7 +55,7 @@ func askForInput(value string, sensitive bool) string {
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
-		fmt.Printf( "%s: ", value)
+		fmt.Printf("%s: ", value)
 		if sensitive {
 			responseBytes, err := terminal.ReadPassword(int(os.Stdin.Fd()))
 			handleIfError(err)

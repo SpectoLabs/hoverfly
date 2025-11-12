@@ -57,29 +57,28 @@ var _ = Describe("/api/v2/hoverfly/middleware", func() {
 	})
 })
 
-
 var _ = Describe("/api/v2/hoverfly/middleware when disabled", func() {
 
-    var (
-        hoverfly *functional_tests.Hoverfly
-    )
+	var (
+		hoverfly *functional_tests.Hoverfly
+	)
 
-    BeforeEach(func() {
-        hoverfly = functional_tests.NewHoverfly()
-        hoverfly.Start()
-    })
+	BeforeEach(func() {
+		hoverfly = functional_tests.NewHoverfly()
+		hoverfly.Start()
+	})
 
-    AfterEach(func() {
-        hoverfly.Stop()
-    })
+	AfterEach(func() {
+		hoverfly.Stop()
+	})
 
-    Context("PUT", func() {
+	Context("PUT", func() {
 
-        It("Should return 404 when setting middleware", func() {
-            req := sling.New().Put("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/hoverfly/middleware")
-            req.Body(strings.NewReader(`{"binary":"ruby","script":"puts 'hi'"}`))
-            res := functional_tests.DoRequest(req)
-            Expect(res.StatusCode).To(Equal(404))
-        })
-    })
+		It("Should return 404 when setting middleware", func() {
+			req := sling.New().Put("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/hoverfly/middleware")
+			req.Body(strings.NewReader(`{"binary":"ruby","script":"puts 'hi'"}`))
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(404))
+		})
+	})
 })

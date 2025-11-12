@@ -22,7 +22,7 @@ const (
 	expireOffset = 3600
 )
 
-//Token - container for jwt.Token for encoding
+// Token - container for jwt.Token for encoding
 type Token struct {
 	Token *jwt.Token
 }

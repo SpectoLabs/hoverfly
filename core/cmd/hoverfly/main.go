@@ -446,7 +446,6 @@ func main() {
 		cfg.Destination = *destination
 	}
 
-
 	if len(responseBodyFilesPath) > 0 {
 		// Ensure file path is absolute and exists in the file system
 		if !filepath.IsAbs(responseBodyFilesPath) {
@@ -462,8 +461,6 @@ func main() {
 
 		cfg.ResponsesBodyFilesPath = absBasePath
 	}
-
-
 
 	for _, allowedOrigin := range responseBodyFilesAllowedOriginFlags {
 		if !util.IsURL(allowedOrigin) {

@@ -178,7 +178,6 @@ func Test_HeaderMatching(t *testing.T) {
 
 }
 
-
 func Test_HeaderMatching_NotModifyingOriginalRequestHeaders(t *testing.T) {
 	RegisterTestingT(t)
 

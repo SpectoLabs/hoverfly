@@ -82,7 +82,7 @@ func Test_Journal_NewEntryWithMemoryLimit_TruncateBody(t *testing.T) {
 	unit := journal.NewJournal()
 	unit.BodySizeLimit = 15
 
-	request, _ := http.NewRequest("GET", "http://hoverfly.io", io.NopCloser(bytes.NewBufferString("large request body")),)
+	request, _ := http.NewRequest("GET", "http://hoverfly.io", io.NopCloser(bytes.NewBufferString("large request body")))
 
 	nowTime := time.Now()
 
@@ -111,7 +111,6 @@ func Test_Journal_NewEntryWithMemoryLimit_TruncateBody(t *testing.T) {
 	Expect(entries[0].Response.Status).To(Equal(200))
 	Expect(entries[0].Response.Body).To(Equal("large respon..."))
 }
-
 
 func Test_Journal_UpdateEntry_AddsRemotePostServeActionToJournalEntry(t *testing.T) {
 	RegisterTestingT(t)

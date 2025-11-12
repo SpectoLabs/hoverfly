@@ -417,7 +417,6 @@ func TestResolveAndValidatePath(t *testing.T) {
 	}
 }
 
-
 func TestTruncateStringWithEllipsis(t *testing.T) {
 
 	tests := []struct {
@@ -484,5 +483,3 @@ func TestTruncateStringWithEllipsis(t *testing.T) {
 		})
 	}
 }
-
-
