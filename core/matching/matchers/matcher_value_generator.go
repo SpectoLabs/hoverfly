@@ -2,8 +2,9 @@ package matchers
 
 import (
 	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/core/util"
 	"reflect"
+
+	"github.com/SpectoLabs/hoverfly/core/util"
 
 	log "github.com/sirupsen/logrus"
 	"k8s.io/client-go/util/jsonpath"

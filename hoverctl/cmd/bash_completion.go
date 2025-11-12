@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
 	"os/user"
 	"path"
 	"path/filepath"
 	"runtime"
+
+	"github.com/spf13/cobra"
 )
 
 var completionCmd = &cobra.Command{

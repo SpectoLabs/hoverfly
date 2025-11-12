@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
+
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"

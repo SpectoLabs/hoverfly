@@ -2,8 +2,9 @@ package delay
 
 import (
 	"errors"
-	"gonum.org/v1/gonum/stat/distuv"
 	"math"
+
+	"gonum.org/v1/gonum/stat/distuv"
 )
 
 func ValidateLogNormalDelayOptions(min int, max int, mean int, median int) error {

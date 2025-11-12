@@ -3,11 +3,12 @@ package cmd
 import (
 	"bufio"
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"github.com/olekukonko/tablewriter"
 	"golang.org/x/crypto/ssh/terminal"
-	"os"
-	"strings"
 )
 
 func handleIfError(err error) {

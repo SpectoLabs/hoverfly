@@ -1,10 +1,11 @@
 package cors
 
 import (
-	. "github.com/onsi/gomega"
 	"io"
 	"net/http"
 	"testing"
+
+	. "github.com/onsi/gomega"
 )
 
 func Test_InterceptPreflightRequest_ReturnSuccessResponseWithDefaultHeaders(t *testing.T) {

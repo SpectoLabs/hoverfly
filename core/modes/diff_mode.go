@@ -6,16 +6,17 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"reflect"
+	"time"
+
 	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/dsnet/compress/brotli"
 	log "github.com/sirupsen/logrus"
-	"io"
-	"net/http"
-	"reflect"
-	"time"
 )
 
 type HoverflyDiff interface {

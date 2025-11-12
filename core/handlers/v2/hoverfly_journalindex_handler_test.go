@@ -3,10 +3,11 @@ package v2
 import (
 	"bytes"
 	"encoding/json"
-	. "github.com/onsi/gomega"
 	"io"
 	"net/http"
 	"testing"
+
+	. "github.com/onsi/gomega"
 )
 
 type HoverflyJournalIndexStub struct{}

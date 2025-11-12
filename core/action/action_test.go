@@ -1,11 +1,12 @@
 package action_test
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/journal"
-	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/journal"
+	"github.com/gorilla/mux"
 
 	"github.com/SpectoLabs/hoverfly/core/action"
 	"github.com/SpectoLabs/hoverfly/core/models"

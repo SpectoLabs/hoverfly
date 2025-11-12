@@ -1,9 +1,10 @@
 package templating
 
 import (
+	"testing"
+
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	. "github.com/onsi/gomega"
-	"testing"
 )
 
 func Test_NewDataSourceMethod(t *testing.T) {

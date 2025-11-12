@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	. "github.com/onsi/gomega"
 	"net/http"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	. "github.com/onsi/gomega"
 )
 
 func BenchmarkPutSimulationAPI(b *testing.B) {

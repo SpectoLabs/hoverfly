@@ -2,9 +2,10 @@ package configuration
 
 import (
 	"bytes"
-	"github.com/spf13/viper"
 	"os"
 	"testing"
+
+	"github.com/spf13/viper"
 
 	. "github.com/onsi/gomega"
 )

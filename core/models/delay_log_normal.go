@@ -3,10 +3,11 @@ package models
 import (
 	"errors"
 	"fmt"
-	coreDelay "github.com/SpectoLabs/hoverfly/core/delay"
 	"regexp"
 	"strings"
 	"time"
+
+	coreDelay "github.com/SpectoLabs/hoverfly/core/delay"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	log "github.com/sirupsen/logrus"

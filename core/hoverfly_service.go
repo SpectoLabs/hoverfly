@@ -3,9 +3,10 @@ package hoverfly
 import (
 	"errors"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/templating"
 	"regexp"
 	"sort"
+
+	"github.com/SpectoLabs/hoverfly/core/templating"
 
 	"github.com/SpectoLabs/hoverfly/core/action"
 	"github.com/SpectoLabs/hoverfly/core/delay"

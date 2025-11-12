@@ -2,9 +2,10 @@ package wrapper
 
 import (
 	"encoding/json"
+	"io"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
-	"io"
 )
 
 func GetCurrentState(target configuration.Target) (map[string]string, error) {

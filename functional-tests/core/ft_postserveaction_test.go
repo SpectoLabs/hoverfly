@@ -2,12 +2,13 @@ package hoverfly_test
 
 import (
 	"encoding/json"
+	"io/ioutil"
+
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	functional_tests "github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
 )
 
 var _ = Describe("Manage post serve actions in hoverfly", func() {

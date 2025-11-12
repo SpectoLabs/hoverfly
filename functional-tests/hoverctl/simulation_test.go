@@ -1,10 +1,11 @@
 package hoverctl_suite
 
 import (
+	"io/ioutil"
+
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
 )
 
 var _ = Describe("When I add simulation with hoverctl", func() {

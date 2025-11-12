@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/util"

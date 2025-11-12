@@ -2,7 +2,6 @@ package journal_test
 
 import (
 	"bytes"
-	"github.com/SpectoLabs/hoverfly/core/models"
 	"io"
 	"net/http"
 	"net/url"
@@ -10,6 +9,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/SpectoLabs/hoverfly/core/models"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/journal"

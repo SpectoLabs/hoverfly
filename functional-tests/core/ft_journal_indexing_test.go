@@ -1,15 +1,16 @@
 package hoverfly_test
 
 import (
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+
 	functional_tests "github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io"
-	"net/http"
-	"net/http/httptest"
-	"strings"
 )
 
 var _ = Describe("Manage journal indexing in hoverfly", func() {

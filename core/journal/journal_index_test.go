@@ -1,11 +1,12 @@
 package journal
 
 import (
+	"testing"
+
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
-	"testing"
 )
 
 func TestIndex_AddJournalEntry(t *testing.T) {

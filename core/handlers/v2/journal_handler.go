@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"strconv"
+	"time"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
-	"strconv"
-	"time"
 )
 
 const DefaultJournalLimit = 25

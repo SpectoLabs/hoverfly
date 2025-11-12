@@ -3,12 +3,13 @@ package hoverfly
 import (
 	"bytes"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/cors"
-	"github.com/SpectoLabs/hoverfly/core/modes"
 	"io"
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/cors"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"

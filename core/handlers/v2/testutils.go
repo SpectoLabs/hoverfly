@@ -3,11 +3,12 @@ package v2
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/core/handlers"
-	"github.com/codegangsta/negroni"
 	"io"
 	"net/http"
 	"net/http/httptest"
+
+	"github.com/SpectoLabs/hoverfly/core/handlers"
+	"github.com/codegangsta/negroni"
 )
 
 func makeRequestOnHandler(handlerFunc negroni.HandlerFunc, request *http.Request) *httptest.ResponseRecorder {

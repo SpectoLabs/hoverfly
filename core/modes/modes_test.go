@@ -2,10 +2,11 @@ package modes_test
 
 import (
 	"errors"
-	"github.com/SpectoLabs/hoverfly/core/util"
 	"io"
 	"net/http"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/util"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"

@@ -1,13 +1,14 @@
 package hoverfly_test
 
 import (
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
 )
 
 var _ = Describe("When I run Hoverfly", func() {

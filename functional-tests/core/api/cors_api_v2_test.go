@@ -1,11 +1,12 @@
 package api_test
 
 import (
+	"io/ioutil"
+
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
 )
 
 var _ = Describe("/api/v2/hoverfly/cors", func() {
