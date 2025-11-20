@@ -1,6 +1,7 @@
 package templating_test
 
 import (
+	"encoding/base64"
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -943,6 +944,68 @@ func Test_ApplyTemplate_setHeader(t *testing.T) {
 	Expect(err).To(BeNil())
 	Expect(result).To(Equal(""))
 	Expect(response.Headers).To(HaveKeyWithValue("X-Test-Header", []string{"HeaderValue"}))
+}
+
+func Test_ApplyTemplate_jsonFromJWT_ExtractClaims(t *testing.T) {
+	RegisterTestingT(t)
+
+	// Build a simple unsigned JWT (header.payload.signature)
+	header := base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"none","typ":"JWT"}`))
+	payload := base64.RawURLEncoding.EncodeToString([]byte(`{"sub":"integrationUser","roles":["dev","ops"],"exp":1732060800}`))
+	signature := base64.RawURLEncoding.EncodeToString([]byte("sig"))
+	token := header + "." + payload + "." + signature
+
+	requestDetails := &models.RequestDetails{
+		Headers: map[string][]string{
+			"Authorization": {"Bearer " + token},
+		},
+		Body: "{}",
+	}
+
+	templateString := `Subject: {{ jsonFromJWT '$.payload.sub' (Request.Header.Authorization) }} Roles: {{#each (jsonFromJWT '$.payload.roles' (Request.Header.Authorization))}}{{this}} {{/each}}`
+
+	result, err := ApplyTemplate(requestDetails, make(map[string]string), templateString)
+	Expect(err).To(BeNil())
+	Expect(result).To(Equal("Subject: integrationUser Roles: dev ops "))
+}
+
+func Test_ApplyTemplate_jsonFromJWT_MissingClaimReturnsEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
+	header := base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"none"}`))
+	payload := base64.RawURLEncoding.EncodeToString([]byte(`{"sub":"user42"}`))
+	signature := base64.RawURLEncoding.EncodeToString([]byte("sig"))
+	token := header + "." + payload + "." + signature
+
+	requestDetails := &models.RequestDetails{
+		Headers: map[string][]string{
+			"Authorization": {"Bearer " + token},
+		},
+		Body: "{}",
+	}
+
+	templateString := `User: {{ jsonFromJWT '$.payload.sub' (Request.Header.Authorization) }} Missing: {{ jsonFromJWT '$.payload.roles' (Request.Header.Authorization) }}`
+
+	result, err := ApplyTemplate(requestDetails, make(map[string]string), templateString)
+	Expect(err).To(BeNil())
+	Expect(result).To(Equal("User: user42 Missing: "))
+}
+
+func Test_ApplyTemplate_jsonFromJWT_InvalidToken(t *testing.T) {
+	RegisterTestingT(t)
+
+	requestDetails := &models.RequestDetails{
+		Headers: map[string][]string{
+			"Authorization": {"Bearer not-a-real.jwt"},
+		},
+		Body: "{}",
+	}
+
+	templateString := `Sub: {{ jsonFromJWT '$.payload.sub' (Request.Header.Authorization) }}`
+
+	result, err := ApplyTemplate(requestDetails, make(map[string]string), templateString)
+	Expect(err).To(BeNil())
+	Expect(result).To(Equal("Sub: "))
 }
 
 func toInterfaceSlice(arguments []string) []interface{} {

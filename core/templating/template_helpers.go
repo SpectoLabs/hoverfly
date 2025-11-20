@@ -1,6 +1,8 @@
 package templating
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"math"
 	"reflect"
@@ -611,6 +613,66 @@ func (t templateHelpers) getValue(key string, options *raymond.Options) string {
 	if exits {
 		return value.(string)
 	} else {
+		return ""
+	}
+}
+
+// jsonFromJWT extracts data from a JWT using a JSONPath query.
+// Returns string, []interface{} (for arrays), or "" on errors/not found.
+func (t templateHelpers) jsonFromJWT(path string, token string) interface{} {
+	token = strings.TrimSpace(token)
+	if token == "" {
+		return ""
+	}
+	low := strings.ToLower(token)
+	if strings.HasPrefix(low, "bearer ") {
+		token = strings.TrimSpace(token[7:])
+	}
+
+	parts := strings.Split(token, ".")
+	if len(parts) != 3 {
+		log.Error("invalid jwt token (segment count) for jsonFromJWT")
+		return ""
+	}
+
+	decode := func(seg string) (interface{}, bool) {
+		b, err := base64.RawURLEncoding.DecodeString(seg)
+		if err != nil {
+			log.Error("error decoding jwt segment: ", err)
+			return nil, false
+		}
+		var v interface{}
+		if err := json.Unmarshal(b, &v); err != nil {
+			log.Error("error unmarshalling jwt segment: ", err)
+			return nil, false
+		}
+		return v, true
+	}
+
+	composite := make(map[string]interface{})
+	if h, ok := decode(parts[0]); ok {
+		composite["header"] = h
+	}
+	if p, ok := decode(parts[1]); ok {
+		composite["payload"] = p
+	}
+
+	jsonBytes, err := json.Marshal(composite)
+	if err != nil {
+		log.Error("error marshaling jwt composite: ", err)
+		return ""
+	}
+
+	result := util.FetchFromRequestBody("jsonpath", path, string(jsonBytes))
+	switch v := result.(type) {
+	case []interface{}:
+		return v
+	case string:
+		if v == "" {
+			return ""
+		}
+		return v
+	default:
 		return ""
 	}
 }

@@ -1,6 +1,7 @@
 package templating
 
 import (
+	"encoding/base64"
 	"testing"
 	"time"
 
@@ -382,4 +383,57 @@ func Test_faker(t *testing.T) {
 	unit := templateHelpers{}
 
 	Expect(unit.faker("JobTitle")[0].String()).To(Not(BeEmpty()))
+}
+
+func Test_jsonFromJWT_basicClaim(t *testing.T) {
+	RegisterTestingT(t)
+	header := base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"none"}`))
+	payload := base64.RawURLEncoding.EncodeToString([]byte(`{"sub":"user1","roles":["a","b"],"num":1234567890}`))
+	sig := base64.RawURLEncoding.EncodeToString([]byte("sig"))
+	token := header + "." + payload + "." + sig
+
+	unit := templateHelpers{}
+	Expect(unit.jsonFromJWT("$.payload.sub", token)).To(Equal("user1"))
+}
+
+func Test_jsonFromJWT_arrayClaim(t *testing.T) {
+	RegisterTestingT(t)
+	header := base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"none"}`))
+	payload := base64.RawURLEncoding.EncodeToString([]byte(`{"roles":["a","b","c"]}`))
+	sig := base64.RawURLEncoding.EncodeToString([]byte("sig"))
+	token := header + "." + payload + "." + sig
+
+	unit := templateHelpers{}
+	result := unit.jsonFromJWT("$.payload.roles", token)
+	arr, ok := result.([]interface{})
+	Expect(ok).To(BeTrue())
+	Expect(arr).To(ConsistOf("a", "b", "c"))
+}
+
+func Test_jsonFromJWT_bearerPrefix(t *testing.T) {
+	RegisterTestingT(t)
+	header := base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"none"}`))
+	payload := base64.RawURLEncoding.EncodeToString([]byte(`{"sub":"userX"}`))
+	sig := base64.RawURLEncoding.EncodeToString([]byte("sig"))
+	token := "Bearer " + header + "." + payload + "." + sig
+
+	unit := templateHelpers{}
+	Expect(unit.jsonFromJWT("$.payload.sub", token)).To(Equal("userX"))
+}
+
+func Test_jsonFromJWT_invalidToken(t *testing.T) {
+	RegisterTestingT(t)
+	unit := templateHelpers{}
+	Expect(unit.jsonFromJWT("$.payload.sub", "not-a-jwt")).To(Equal(""))
+}
+
+func Test_jsonFromJWT_missingClaim(t *testing.T) {
+	RegisterTestingT(t)
+	header := base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"none"}`))
+	payload := base64.RawURLEncoding.EncodeToString([]byte(`{"sub":"user1"}`))
+	sig := base64.RawURLEncoding.EncodeToString([]byte("sig"))
+	token := header + "." + payload + "." + sig
+
+	unit := templateHelpers{}
+	Expect(unit.jsonFromJWT("$.payload.missing", token)).To(Equal(""))
 }
