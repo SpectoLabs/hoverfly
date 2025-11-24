@@ -115,6 +115,7 @@ func NewEnrichedTemplator(journal *journal.Journal) *Templator {
 	helperMethodMap["getArray"] = t.getArray
 	helperMethodMap["putValue"] = t.putValue
 	helperMethodMap["getValue"] = t.getValue
+	helperMethodMap["jsonFromJWT"] = t.jsonFromJWT
 	if !helpersRegistered {
 		raymond.RegisterHelpers(helperMethodMap)
 		helpersRegistered = true
