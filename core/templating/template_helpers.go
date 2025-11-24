@@ -635,27 +635,13 @@ func (t templateHelpers) jsonFromJWT(path string, token string) interface{} {
 		return ""
 	}
 
-	decode := func(seg string) (interface{}, bool) {
-		b, err := base64.RawURLEncoding.DecodeString(seg)
-		if err != nil {
-			log.Error("error decoding jwt segment: ", err)
-			return nil, false
-		}
-		var v interface{}
-		if err := json.Unmarshal(b, &v); err != nil {
-			log.Error("error unmarshalling jwt segment: ", err)
-			return nil, false
-		}
-		return v, true
-	}
-
-	composite := make(map[string]interface{})
-	if h, ok := decode(parts[0]); ok {
-		composite["header"] = h
-	}
-	if p, ok := decode(parts[1]); ok {
-		composite["payload"] = p
-	}
+ 	composite := make(map[string]interface{})
+    if h, ok := decodeJWTSegment(parts[0]); ok {
+        composite["header"] = h
+    }
+    if p, ok := decodeJWTSegment(parts[1]); ok {
+        composite["payload"] = p
+    }
 
 	jsonBytes, err := json.Marshal(composite)
 	if err != nil {
@@ -675,6 +661,22 @@ func (t templateHelpers) jsonFromJWT(path string, token string) interface{} {
 	default:
 		return ""
 	}
+}
+
+// decodeJWTSegment decodes a single JWT segment (header or payload) into a generic map/array.
+// It returns the decoded JSON value and a boolean indicating success.
+func decodeJWTSegment(seg string) (interface{}, bool) {
+    b, err := base64.RawURLEncoding.DecodeString(seg)
+    if err != nil {
+        log.Error("error decoding jwt segment: ", err)
+        return nil, false
+    }
+    var v interface{}
+    if err := json.Unmarshal(b, &v); err != nil {
+        log.Error("error unmarshalling jwt segment: ", err)
+        return nil, false
+    }
+    return v, true
 }
 
 func sumNumbers(numbers []string, format string) string {
