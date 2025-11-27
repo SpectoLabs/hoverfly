@@ -45,7 +45,7 @@ Currently, you can get the following data from request to the response via templ
 +------------------------------+-----------------------------------------------------------------------+--------------------------------------------------------------+-----------------------+
 | State                        | ``{{ State.basket }}``                                                | State Store: ``{"basket":"eggs"}``                           | eggs                  |
 +------------------------------+-----------------------------------------------------------------------+--------------------------------------------------------------+-----------------------+
-| JWT claim (string)           | ``{{ jsonFromJWT '$.payload.user_id' (Request.Header.Authorization) }}`` | Header: ``Authorization: Bearer <JWT with user_id claim>`` | 7b0d170d-... (user_id)|
+| JWT claim (string)           | ``{{ jsonFromJWT '$.payload.id' (Request.Header.Authorization) }}``   | Header: ``Authorization: Bearer <JWT with id claim>``        | 7b0d170d-... (id)     |
 +------------------------------+-----------------------------------------------------------------------+--------------------------------------------------------------+-----------------------+
 
 Helper Methods
