@@ -1,0 +1,14 @@
+{
+    "headers": {
+        "Authorization": [
+            {
+                "matcher": "jwtjsonpath",
+                "value": "$.user_name",
+                "doMatch": {
+                    "matcher": "regex",
+                    "value": "stuart.kelly"
+                }
+            }
+        ]
+    }
+}

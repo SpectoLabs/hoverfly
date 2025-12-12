@@ -653,3 +653,28 @@ Example
         "matcher": "exact",
         "value": "1"
     }
+
+
+JWT JSONPath matcher
+--------------------
+
+Parses the matcher value as a JSONPath expression and executes it against the decoded JWT header/payload. The JWT is transformed into a JSON document of the form ``{"header": {...}, "payload": {...}}`` (signature is not verified). When using a shorthand path like ``$.user_name``, it targets ``$.payload.user_name`` by default; you can explicitly reference ``$.header.*`` or ``$.payload.*``.
+
+This matcher is especially useful with matcher chaining, where the extracted value is passed to a second matcher (e.g., ``regex``) for further evaluation.
+
+Example
+""""""
+.. code:: json
+
+        "headers": {
+            "Authorization": [
+                {
+                    "matcher": "jwtjsonpath",
+                    "value": "$.user_name",
+                    "doMatch": {
+                        "matcher": "regex",
+                        "value": "stuart.kelly"
+                    }
+                }
+            ]
+        }
