@@ -95,14 +95,21 @@ func (this Hoverfly) Stop() {
 }
 
 func (this Hoverfly) StopAPIAuthenticated(username, password string) {
-	token, err := this.getAPIToken(username, password)
-	if err != nil {
-		return
-	}
-	_, err = doRequest(sling.New().Delete(this.adminUrl+"/api/v2/shutdown").Add("Authorization", "Bearer "+token))
-	if err != nil {
-		panic(err)
-	}
+    // In teardown, we should be tolerant to failures when shutting down.
+    // If Hoverfly is already stopped or the connection closes early (EOF), just return.
+    token, err := this.getAPIToken(username, password)
+    if err != nil {
+        return
+    }
+    resp, err := doRequest(sling.New().Delete(this.adminUrl+"/api/v2/shutdown").Add("Authorization", "Bearer "+token))
+    if resp != nil && resp.Body != nil {
+        io.Copy(io.Discard, resp.Body)
+        resp.Body.Close()
+    }
+    if err != nil {
+        // swallow error to avoid panicking AfterEach
+        return
+    }
 }
 
 func (this Hoverfly) DeleteBoltDb() {
