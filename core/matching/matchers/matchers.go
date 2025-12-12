@@ -60,6 +60,10 @@ var Matchers = map[string]MatcherDetails{
 		MatcherFunction:     JwtMatcher,
 		MatchValueGenerator: JwtMatchValueGenerator,
 	},
+	JWTJsonPath: {
+		MatcherFunction:     JwtJsonPathMatch,
+		MatchValueGenerator: JwtJsonPathMatchValueGenerator,
+	},
 	Negation: {
 		MatcherFunction:     NegationMatch,
 		MatchValueGenerator: IdentityValueGenerator,
