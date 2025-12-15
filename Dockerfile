@@ -1,4 +1,4 @@
-FROM golang:1.25.4 AS build-env
+FROM golang:1.25.5 AS build-env
 WORKDIR /usr/local/go/src/github.com/SpectoLabs/hoverfly
 COPY . /usr/local/go/src/github.com/SpectoLabs/hoverfly
 
@@ -7,7 +7,7 @@ ARG TARGETOS=linux
 ARG TARGETARCH
 RUN cd core/cmd/hoverfly \
     && CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
-       go install -ldflags "-s -w"
+    go install -ldflags "-s -w"
 
 # Final minimal image based on Alpine, without running apk to avoid QEMU trigger issues
 FROM alpine:3.20
