@@ -584,24 +584,54 @@ func TableToSliceMapStringString(table string) map[string]map[string]string {
 	results := map[string]map[string]string{}
 
 	tableRows := strings.Split(table, "\n")
-	headings := []string{}
+	var headings []string
 
-	for _, heading := range strings.Split(tableRows[1], "|") {
+	if len(tableRows) < 2 {
+		return results
+	}
+
+
+	// Find the header row. It's usually the first row containing '│'
+	headerRowIndex := -1
+	for i, row := range tableRows {
+		if strings.Contains(row, "│") {
+			headerRowIndex = i
+			break
+		}
+	}
+
+	if headerRowIndex == -1 {
+		return results
+	}
+
+	// Split by any of the box drawing vertical bars or the old pipe
+	splitFn := func(c rune) bool {
+		return c == '│' || c == '|'
+	}
+
+	for _, heading := range strings.FieldsFunc(tableRows[headerRowIndex], splitFn) {
 		headings = append(headings, strings.TrimSpace(heading))
 	}
 
-	for _, row := range tableRows[2:] {
-		if !strings.Contains(row, "-+-") {
-			rowValues := strings.Split(row, "|")
+	for _, row := range tableRows[headerRowIndex+1:] {
+		// Skip separator rows (they contain horizontal box drawing characters)
+		if strings.ContainsAny(row, "─┬┐├┼┤└┴┘") || strings.Contains(row, "-+-") {
+			continue
+		}
+
+		if strings.Contains(row, "│") || strings.Contains(row, "|") {
+			rowValues := strings.FieldsFunc(row, splitFn)
 
 			result := map[string]string{}
 			for i, value := range rowValues {
-				if value != "" {
+				if i < len(headings) {
 					result[headings[i]] = strings.TrimSpace(value)
 				}
 			}
 
-			results[result["TARGET NAME"]] = result
+			if targetName, ok := result["TARGET NAME"]; ok {
+				results[targetName] = result
+			}
 		}
 	}
 

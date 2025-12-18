@@ -29,40 +29,40 @@ var _ = Describe("when I use hoverctl status", func() {
 
 			It("Print it", func() {
 				output := functional_tests.Run(hoverctlBinary, "status")
-				Expect(output).To(ContainSubstring("Hoverfly   | running"))
-				Expect(output).To(ContainSubstring("Admin port |    " + hoverfly.GetAdminPort()))
-				Expect(output).To(ContainSubstring("Proxy port |     8500"))
-				Expect(output).To(ContainSubstring("Proxy type | forward"))
-				Expect(output).To(ContainSubstring("Mode       | simulate"))
-				Expect(output).To(ContainSubstring("Middleware | disabled"))
-				Expect(output).To(ContainSubstring("CORS       | disabled"))
+				Expect(output).To(ContainSubstring("Hoverfly   │ running"))
+				Expect(output).To(ContainSubstring("Admin port │ " + hoverfly.GetAdminPort()))
+				Expect(output).To(ContainSubstring("Proxy port │ 8500"))
+				Expect(output).To(ContainSubstring("Proxy type │ forward"))
+				Expect(output).To(ContainSubstring("Mode       │ simulate"))
+				Expect(output).To(ContainSubstring("Middleware │ disabled"))
+				Expect(output).To(ContainSubstring("CORS       │ disabled"))
 			})
 
 			It("should get the mode from Hoverfly", func() {
 				hoverfly.SetMode("capture")
 
 				output := functional_tests.Run(hoverctlBinary, "status")
-				Expect(output).To(ContainSubstring("Mode       | capture"))
+				Expect(output).To(ContainSubstring("Mode       │ capture"))
 
 				hoverfly.SetMode("synthesize")
 
 				output = functional_tests.Run(hoverctlBinary, "status")
-				Expect(output).To(ContainSubstring("Mode       | synthesize"))
+				Expect(output).To(ContainSubstring("Mode       │ synthesize"))
 
 				hoverfly.SetMode("modify")
 
 				output = functional_tests.Run(hoverctlBinary, "status")
-				Expect(output).To(ContainSubstring("Mode       | modify"))
+				Expect(output).To(ContainSubstring("Mode       │ modify"))
 			})
 
 			It("should get the middleware from Hoverfly", func() {
 				output := functional_tests.Run(hoverctlBinary, "status")
-				Expect(output).To(ContainSubstring("Middleware | disabled"))
+				Expect(output).To(ContainSubstring("Middleware │ disabled"))
 
 				hoverfly.SetMiddleware("python", functional_tests.Middleware)
 
 				output = functional_tests.Run(hoverctlBinary, "status")
-				Expect(output).To(ContainSubstring("Middleware | enabled"))
+				Expect(output).To(ContainSubstring("Middleware │ enabled"))
 
 				Expect(output).To(ContainSubstring("Hoverfly is using local middleware with the command python and the script:"))
 				Expect(output).To(ContainSubstring(functional_tests.Middleware))
@@ -88,7 +88,7 @@ var _ = Describe("when I use hoverctl status", func() {
 
 			It("should get proxy type from Hoverfly", func() {
 				output := functional_tests.Run(hoverctlBinary, "status")
-				Expect(output).To(ContainSubstring("Proxy type | reverse (webserver)"))
+				Expect(output).To(ContainSubstring("Proxy type │ reverse (webserver)"))
 			})
 		})
 	})
@@ -110,7 +110,7 @@ var _ = Describe("when I use hoverctl status", func() {
 
 			It("should get the CORS status from Hoverfly", func() {
 				output := functional_tests.Run(hoverctlBinary, "status")
-				Expect(output).To(ContainSubstring("CORS       | enabled"))
+				Expect(output).To(ContainSubstring("CORS       │ enabled"))
 			})
 		})
 	})
