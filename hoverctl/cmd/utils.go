@@ -75,7 +75,11 @@ func askForInput(value string, sensitive bool) string {
 func drawTable(data [][]string, header bool) {
 	table := tablewriter.NewWriter(os.Stdout)
 	if header {
-		table.SetHeader(data[0])
+		headerData := make([]any, len(data[0]))
+		for i, v := range data[0] {
+			headerData[i] = v
+		}
+		table.Header(headerData...)
 		data = data[1:]
 	}
 
