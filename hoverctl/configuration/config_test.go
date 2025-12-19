@@ -129,6 +129,94 @@ targets:
 	}))
 }
 
+func Test_GetConfigWillReadConfigFromAYamlFileWithUnderscore(t *testing.T) {
+	RegisterTestingT(t)
+
+	viper.SetConfigType("yaml")
+	var configSource = []byte(`
+default: local
+targets:
+  local:
+    name: local
+    host: localhost
+    admin_port: 8888
+    proxy_port: 8500
+  remote:
+    name: remote
+    host: hoverfly.cloud
+    admin_port: 2345
+    proxy_port: 9875
+`)
+
+	_ = viper.ReadConfig(bytes.NewBuffer(configSource))
+
+	result := parseConfig()
+
+	Expect(*result).To(Equal(Config{
+		DefaultTarget: "local",
+		Targets: map[string]Target{
+			"local": {
+				Name:      "local",
+				Host:      "localhost",
+				AdminPort: 8888,
+				ProxyPort: 8500,
+			},
+
+			"remote": {
+				Name:      "remote",
+				Host:      "hoverfly.cloud",
+				AdminPort: 2345,
+				ProxyPort: 9875,
+			},
+		},
+	}))
+}
+
+func Test_GetConfigWillReadConfigFromAYamlFileWithAuthToken(t *testing.T) {
+	RegisterTestingT(t)
+
+	viper.SetConfigType("yaml")
+	var configSource = []byte(`
+default: local
+targets:
+  local:
+    name: local
+    host: localhost
+    admin.port: 8888
+    proxy.port: 8500
+  remote:
+    name: remote
+    host: hoverfly.cloud
+    admin.port: 2345
+    proxy.port: 9875
+    auth.token: token456
+`)
+
+	_ = viper.ReadConfig(bytes.NewBuffer(configSource))
+
+	result := parseConfig()
+
+	Expect(*result).To(Equal(Config{
+		DefaultTarget: "local",
+		Targets: map[string]Target{
+			"local": {
+				Name:      "local",
+				Host:      "localhost",
+				AdminPort: 8888,
+				ProxyPort: 8500,
+			},
+
+			"remote": {
+				Name:      "remote",
+				Host:      "hoverfly.cloud",
+				AdminPort: 2345,
+				ProxyPort: 9875,
+				AuthToken: "token456",
+			},
+		},
+	}))
+}
+
 func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testing.T) {
 	RegisterTestingT(t)
 

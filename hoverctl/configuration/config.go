@@ -3,6 +3,7 @@ package configuration
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -54,6 +55,35 @@ func parseConfig() *Config {
 	for key, target := range config.Targets {
 		if target.Host == "" {
 			target.Host = defaultTarget.Host
+		}
+
+		// Backward compatibility for admin.port and proxy.port
+		// Viper unmarshal might fail to map keys with dots into a map of structs
+		targetMap := viper.GetStringMap("targets." + key)
+		if target.AdminPort == 0 {
+			if adminPort, ok := targetMap["admin.port"].(int); ok {
+				target.AdminPort = adminPort
+			} else if adminPortStr, ok := targetMap["admin.port"].(string); ok {
+				target.AdminPort, _ = strconv.Atoi(adminPortStr)
+			} else if adminPortFloat, ok := targetMap["admin.port"].(float64); ok {
+				target.AdminPort = int(adminPortFloat)
+			}
+		}
+
+		if target.ProxyPort == 0 {
+			if proxyPort, ok := targetMap["proxy.port"].(int); ok {
+				target.ProxyPort = proxyPort
+			} else if proxyPortStr, ok := targetMap["proxy.port"].(string); ok {
+				target.ProxyPort, _ = strconv.Atoi(proxyPortStr)
+			} else if proxyPortFloat, ok := targetMap["proxy.port"].(float64); ok {
+				target.ProxyPort = int(proxyPortFloat)
+			}
+		}
+
+		if target.AuthToken == "" {
+			if authToken, ok := targetMap["auth.token"].(string); ok {
+				target.AuthToken = authToken
+			}
 		}
 
 		if target.AdminPort == 0 {
