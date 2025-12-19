@@ -11,55 +11,108 @@
 package viper
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"unicode"
 
-	"github.com/BurntSushi/toml"
-	"github.com/hashicorp/hcl"
-	"github.com/magiconair/properties"
 	"github.com/spf13/cast"
-	jww "github.com/spf13/jwalterweatherman"
-	"gopkg.in/yaml.v2"
 )
 
-// Denotes failing to parse configuration file.
+// ConfigParseError denotes failing to parse configuration file.
 type ConfigParseError struct {
 	err error
 }
 
-// Returns the formatted configuration error.
+// Error returns the formatted configuration error.
 func (pe ConfigParseError) Error() string {
 	return fmt.Sprintf("While parsing config: %s", pe.err.Error())
 }
 
-func insensitiviseMap(m map[string]interface{}) {
+// Unwrap returns the wrapped error.
+func (pe ConfigParseError) Unwrap() error {
+	return pe.err
+}
+
+// toCaseInsensitiveValue checks if the value is a  map;
+// if so, create a copy and lower-case the keys recursively.
+func toCaseInsensitiveValue(value any) any {
+	switch v := value.(type) {
+	case map[any]any:
+		value = copyAndInsensitiviseMap(cast.ToStringMap(v))
+	case map[string]any:
+		value = copyAndInsensitiviseMap(v)
+	}
+
+	return value
+}
+
+// copyAndInsensitiviseMap behaves like insensitiviseMap, but creates a copy of
+// any map it makes case insensitive.
+func copyAndInsensitiviseMap(m map[string]any) map[string]any {
+	nm := make(map[string]any)
+
 	for key, val := range m {
+		lkey := strings.ToLower(key)
+		switch v := val.(type) {
+		case map[any]any:
+			nm[lkey] = copyAndInsensitiviseMap(cast.ToStringMap(v))
+		case map[string]any:
+			nm[lkey] = copyAndInsensitiviseMap(v)
+		default:
+			nm[lkey] = v
+		}
+	}
+
+	return nm
+}
+
+func insensitiviseVal(val any) any {
+	switch v := val.(type) {
+	case map[any]any:
+		// nested map: cast and recursively insensitivise
+		val = cast.ToStringMap(val)
+		insensitiviseMap(val.(map[string]any))
+	case map[string]any:
+		// nested map: recursively insensitivise
+		insensitiviseMap(v)
+	case []any:
+		// nested array: recursively insensitivise
+		insensitiveArray(v)
+	}
+	return val
+}
+
+func insensitiviseMap(m map[string]any) {
+	for key, val := range m {
+		val = insensitiviseVal(val)
 		lower := strings.ToLower(key)
 		if key != lower {
+			// remove old key (not lower-cased)
 			delete(m, key)
-			m[lower] = val
 		}
+		// update map
+		m[lower] = val
 	}
 }
 
-func absPathify(inPath string) string {
-	jww.INFO.Println("Trying to resolve absolute path to", inPath)
+func insensitiveArray(a []any) {
+	for i, val := range a {
+		a[i] = insensitiviseVal(val)
+	}
+}
 
-	if strings.HasPrefix(inPath, "$HOME") {
+func absPathify(logger *slog.Logger, inPath string) string {
+	logger.Info("trying to resolve absolute path", "path", inPath)
+
+	if inPath == "$HOME" || strings.HasPrefix(inPath, "$HOME"+string(os.PathSeparator)) {
 		inPath = userHomeDir() + inPath[5:]
 	}
 
-	if strings.HasPrefix(inPath, "$") {
-		end := strings.Index(inPath, string(os.PathSeparator))
-		inPath = os.Getenv(inPath[1:end]) + inPath[end:]
-	}
+	inPath = os.ExpandEnv(inPath)
 
 	if filepath.IsAbs(inPath) {
 		return filepath.Clean(inPath)
@@ -68,32 +121,11 @@ func absPathify(inPath string) string {
 	p, err := filepath.Abs(inPath)
 	if err == nil {
 		return filepath.Clean(p)
-	} else {
-		jww.ERROR.Println("Couldn't discover absolute path")
-		jww.ERROR.Println(err)
 	}
+
+	logger.Error(fmt.Errorf("could not discover absolute path: %w", err).Error())
+
 	return ""
-}
-
-// Check if File / Directory Exists
-func exists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return false, err
-}
-
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
 }
 
 func userHomeDir() string {
@@ -107,74 +139,6 @@ func userHomeDir() string {
 	return os.Getenv("HOME")
 }
 
-func findCWD() (string, error) {
-	serverFile, err := filepath.Abs(os.Args[0])
-
-	if err != nil {
-		return "", fmt.Errorf("Can't get absolute path for executable: %v", err)
-	}
-
-	path := filepath.Dir(serverFile)
-	realFile, err := filepath.EvalSymlinks(serverFile)
-
-	if err != nil {
-		if _, err = os.Stat(serverFile + ".exe"); err == nil {
-			realFile = filepath.Clean(serverFile + ".exe")
-		}
-	}
-
-	if err == nil && realFile != serverFile {
-		path = filepath.Dir(realFile)
-	}
-
-	return path, nil
-}
-
-func unmarshallConfigReader(in io.Reader, c map[string]interface{}, configType string) error {
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(in)
-
-	switch strings.ToLower(configType) {
-	case "yaml", "yml":
-		if err := yaml.Unmarshal(buf.Bytes(), &c); err != nil {
-			return ConfigParseError{err}
-		}
-
-	case "json":
-		if err := json.Unmarshal(buf.Bytes(), &c); err != nil {
-			return ConfigParseError{err}
-		}
-
-	case "hcl":
-		obj, err := hcl.Parse(string(buf.Bytes()))
-		if err != nil {
-			return ConfigParseError{err}
-		}
-		if err = hcl.DecodeObject(&c, obj); err != nil {
-			return ConfigParseError{err}
-		}
-
-	case "toml":
-		if _, err := toml.Decode(buf.String(), &c); err != nil {
-			return ConfigParseError{err}
-		}
-
-	case "properties", "props", "prop":
-		var p *properties.Properties
-		var err error
-		if p, err = properties.Load(buf.Bytes(), properties.UTF8); err != nil {
-			return ConfigParseError{err}
-		}
-		for _, key := range p.Keys() {
-			value, _ := p.Get(key)
-			c[key] = value
-		}
-	}
-
-	insensitiviseMap(c)
-	return nil
-}
-
 func safeMul(a, b uint) uint {
 	c := a * b
 	if a > 1 && b > 1 && c/b != a {
@@ -183,7 +147,7 @@ func safeMul(a, b uint) uint {
 	return c
 }
 
-// parseSizeInBytes converts strings like 1GB or 12 mb into an unsigned integer number of bytes
+// parseSizeInBytes converts strings like 1GB or 12 mb into an unsigned integer number of bytes.
 func parseSizeInBytes(sizeStr string) uint {
 	sizeStr = strings.TrimSpace(sizeStr)
 	lastChar := len(sizeStr) - 1
@@ -210,10 +174,38 @@ func parseSizeInBytes(sizeStr string) uint {
 		}
 	}
 
-	size := cast.ToInt(sizeStr)
-	if size < 0 {
-		size = 0
-	}
+	size := max(cast.ToInt(sizeStr), 0)
 
 	return safeMul(uint(size), multiplier)
+}
+
+// deepSearch scans deep maps, following the key indexes listed in the
+// sequence "path".
+// The last value is expected to be another map, and is returned.
+//
+// In case intermediate keys do not exist, or map to a non-map value,
+// a new map is created and inserted, and the search continues from there:
+// the initial map "m" may be modified!
+func deepSearch(m map[string]any, path []string) map[string]any {
+	for _, k := range path {
+		m2, ok := m[k]
+		if !ok {
+			// intermediate key does not exist
+			// => create it and continue from there
+			m3 := make(map[string]any)
+			m[k] = m3
+			m = m3
+			continue
+		}
+		m3, ok := m2.(map[string]any)
+		if !ok {
+			// intermediate key is a value
+			// => replace with a new map
+			m3 = make(map[string]any)
+			m[k] = m3
+		}
+		// continue search from here
+		m = m3
+	}
+	return m
 }
