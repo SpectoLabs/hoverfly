@@ -8,7 +8,7 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"github.com/olekukonko/tablewriter"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 func handleIfError(err error) {
@@ -58,7 +58,7 @@ func askForInput(value string, sensitive bool) string {
 	for {
 		fmt.Printf("%s: ", value)
 		if sensitive {
-			responseBytes, err := terminal.ReadPassword(int(os.Stdin.Fd()))
+			responseBytes, err := term.ReadPassword(int(os.Stdin.Fd()))
 			handleIfError(err)
 			fmt.Println("")
 
