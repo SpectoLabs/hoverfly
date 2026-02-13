@@ -1,4 +1,4 @@
-FROM golang:1.25.5 AS build-env
+FROM golang:1.26.0 AS build-env
 WORKDIR /usr/local/go/src/github.com/SpectoLabs/hoverfly
 COPY . /usr/local/go/src/github.com/SpectoLabs/hoverfly
 
