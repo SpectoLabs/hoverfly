@@ -90,9 +90,12 @@ func (this *StateHandler) Patch(w http.ResponseWriter, req *http.Request, next h
 	toPatch := &StateView{}
 
 	body, err := io.ReadAll(req.Body)
+	if err != nil {
+		handlers.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	err = json.Unmarshal(body, &toPatch)
-
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
