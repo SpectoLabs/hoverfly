@@ -7,5 +7,4 @@ Native language bindings are available for Hoverfly to make it easy to integrate
 
 .. toctree::
 
-    python
     java
