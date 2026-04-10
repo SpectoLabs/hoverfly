@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -22,6 +23,8 @@ import (
 
 var ProxyAuthorizationHeader string
 
+const errProxyAuthRequired = "407 Proxy authentication required"
+
 // Creates goproxy.ProxyHttpServer and configures it to be used as a proxy for Hoverfly
 // goproxy is given handlers that use the Hoverfly request processing
 func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
@@ -29,6 +32,27 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
+
+	// Fix #774: HTTP/1.1 clients may send requests with a relative URL (path only) and a Host header.
+	// goproxy's default NonproxyHandler returns 500 for these. Reconstruct the absolute URL from the
+	// Host header so the request is processed normally, matching the behaviour of NewWebserverProxy.
+	//
+	// Guard: if the Host header targets the proxy's own port the client is connecting directly to
+	// Hoverfly (not using it as a proxy). In that case keep the original 500 "is a proxy server"
+	// response — forwarding to ourselves would cause infinite recursion or a panic.
+	proxy.NonproxyHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Host == "" {
+			http.Error(w, "Cannot handle requests without Host header, e.g., HTTP 1.0", http.StatusBadRequest)
+			return
+		}
+		if _, port, err := net.SplitHostPort(r.Host); err == nil && port == hoverfly.Cfg.ProxyPort {
+			http.Error(w, "This is a proxy server. Does not respond to non-proxy requests.", http.StatusInternalServerError)
+			return
+		}
+		r.URL.Scheme = "http"
+		r.URL.Host = r.Host
+		proxy.ServeHTTP(w, r)
+	})
 
 	if hoverfly.Cfg.AuthEnabled {
 		log.Info("Enabling proxy authentication")
@@ -201,25 +225,25 @@ func authFromHeader(req *http.Request, basicFunc func(user, passwd string) bool,
 	authheader := strings.SplitN(headerValue, " ", 2)
 	req.Header.Del(ProxyAuthorizationHeader)
 	if len(authheader) != 2 {
-		return fmt.Errorf("407 Proxy authentication required")
+		return fmt.Errorf(errProxyAuthRequired)
 	}
 	if authheader[0] == "Basic" {
 		userpassraw, err := base64.StdEncoding.DecodeString(authheader[1])
 		if err != nil {
-			return fmt.Errorf("407 Proxy authentication required")
+			return fmt.Errorf(errProxyAuthRequired)
 		}
 		userpass := strings.SplitN(string(userpassraw), ":", 2)
 		if len(userpass) != 2 {
-			return fmt.Errorf("407 Proxy authentication required")
+			return fmt.Errorf(errProxyAuthRequired)
 		}
 		result := basicFunc(userpass[0], userpass[1])
 		if result == false {
-			return fmt.Errorf("407 Proxy authentication required")
+			return fmt.Errorf(errProxyAuthRequired)
 		}
 	} else if authheader[0] == "Bearer" {
 		result := bearerFunc(authheader[1])
 		if result == false {
-			return fmt.Errorf("407 Proxy authentication required")
+			return fmt.Errorf(errProxyAuthRequired)
 		}
 	} else {
 		return fmt.Errorf("407 Unknown authentication type `%v`, only `Basic` or `Bearer` are supported", authheader[0])
