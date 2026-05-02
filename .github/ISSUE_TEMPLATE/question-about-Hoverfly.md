@@ -1,6 +1,6 @@
 ---
 name: Questions about Hoverfly
-about: This is not the appropriate channel - please use our Gitter channel
+about: This is not the appropriate channel - please create a GitHub Discussion
 
 ---
 
