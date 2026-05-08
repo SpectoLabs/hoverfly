@@ -1,0 +1,65 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "timezone": "Europe/London",
+  "schedule": [
+    "before 6am on monday"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update cimg/go image in CircleCI config",
+      "fileMatch": [
+        "^\\.circleci/config\\.yml$"
+      ],
+      "matchStrings": [
+        "cimg/go:(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "cimg/go",
+      "versioningTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "description": "Update Go version mentioned in Markdown docs",
+      "fileMatch": [
+        "^CONTRIBUTING\\.md$",
+        "^CLAUDE\\.md$"
+      ],
+      "matchStrings": [
+        "Go (?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "golang-version",
+      "depNameTemplate": "go"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Disable all dependency updates by default; only Go runtime is enabled below",
+      "matchPackageNames": [
+        "*"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Enable and group all Go runtime version bumps into one PR",
+      "matchPackageNames": [
+        "go",
+        "golang",
+        "cimg/go"
+      ],
+      "enabled": true,
+      "groupName": "Go",
+      "commitMessageTopic": "Go",
+      "labels": [
+        "go",
+        "dependencies"
+      ]
+    }
+  ]
+}
