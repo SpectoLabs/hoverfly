@@ -6,7 +6,7 @@ Thanks for your interest in contributing to Hoverfly! This guide will help you g
 
 ### Prerequisites
 
-- **Go 1.26.1+** — install from [golang.org/dl](https://golang.org/dl)
+- **Go 1.26.2+** — install from [golang.org/dl](https://golang.org/dl)
 - **Ruby** and **Python** — needed for some middleware tests
   ```bash
   # macOS
