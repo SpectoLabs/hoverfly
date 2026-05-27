@@ -2,21 +2,16 @@ name: Claude Code Review
 
 on:
   pull_request_target:
-    types: [opened, synchronize, ready_for_review, reopened]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+    types: [labeled, synchronize, reopened, ready_for_review]
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
+    # Gate: a maintainer must add the `claude-review` label. Required because
+    # un-gated pull_request_target on fork PRs would let any contributor cause
+    # the action to run with base-repo credentials.
+    if: |
+      (github.event.action == 'labeled' && github.event.label.name == 'claude-review') ||
+      (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'claude-review'))
 
     runs-on: ubuntu-latest
     permissions:
