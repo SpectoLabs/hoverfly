@@ -14,8 +14,8 @@
     {
       "customType": "regex",
       "description": "Update cimg/go image in CircleCI config",
-      "fileMatch": [
-        "^\\.circleci/config\\.yml$"
+      "managerFilePatterns": [
+        "/^\\.circleci/config\\.yml$/"
       ],
       "matchStrings": [
         "cimg/go:(?<currentValue>\\d+\\.\\d+\\.\\d+)"
@@ -27,9 +27,9 @@
     {
       "customType": "regex",
       "description": "Update Go version mentioned in Markdown docs",
-      "fileMatch": [
-        "^CONTRIBUTING\\.md$",
-        "^CLAUDE\\.md$"
+      "managerFilePatterns": [
+        "/^CONTRIBUTING\\.md$/",
+        "/^CLAUDE\\.md$/"
       ],
       "matchStrings": [
         "Go (?<currentValue>\\d+\\.\\d+\\.\\d+)"
