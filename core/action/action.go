@@ -18,6 +18,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// RemoteActionTimeout caps the total time spent on a remote post-serve action
+// HTTP call (dial, TLS handshake, request write, response read). Without it a
+// non-responsive endpoint would leak the calling goroutine forever
+// (GHSA-42j2-w334-qxw7). Exported so tests can lower it.
+var RemoteActionTimeout = 30 * time.Second
+
 type Action struct {
 	Binary    string
 	Script    *os.File
@@ -140,7 +146,8 @@ func (action *Action) Execute(pair *models.RequestResponsePair, journalIDChannel
 		req.Header.Add("Content-Type", "application/json")
 		req.Header.Add("X-CORRELATION-ID", correlationID)
 
-		resp, err := http.DefaultClient.Do(req)
+		client := &http.Client{Timeout: RemoteActionTimeout}
+		resp, err := client.Do(req)
 		completionTime := time.Now()
 		journalID, received := receiveJournalIdWithTimeout(journalIDChannel, time.Second)
 		log.Info("Journal ID received ", journalID)
