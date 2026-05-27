@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/journal"
 	"github.com/gorilla/mux"
@@ -165,4 +166,45 @@ func Test_ExecuteRemotePostServeAction_WithUnReachableHost(t *testing.T) {
 
 func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
+}
+
+// Regression test for GHSA-42j2-w334-qxw7: a remote post-serve action pointed
+// at a non-responsive endpoint must not block forever. Without the client
+// timeout the goroutine would leak indefinitely.
+func Test_ExecuteRemotePostServeAction_TimesOutOnSlowEndpoint(t *testing.T) {
+	RegisterTestingT(t)
+
+	block := make(chan struct{})
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		<-block
+	}))
+	defer server.Close() // runs last; needs handler to have exited
+	defer close(block)   // runs first; unblocks handler so server can close
+
+	originalTimeout := action.RemoteActionTimeout
+	action.RemoteActionTimeout = 100 * time.Millisecond
+	defer func() { action.RemoteActionTimeout = originalTimeout }()
+
+	newAction, err := action.NewRemoteAction(server.URL+"/slow", 0)
+	Expect(err).To(BeNil())
+
+	originalPair := models.RequestResponsePair{
+		Response: models.ResponseDetails{Body: "Normal body"},
+	}
+	journalIDChannel := make(chan string, 1)
+	journalIDChannel <- "1"
+	newJournal := journal.NewJournal()
+
+	done := make(chan error, 1)
+	go func() {
+		done <- newAction.Execute(&originalPair, journalIDChannel, newJournal)
+	}()
+
+	select {
+	case err := <-done:
+		Expect(err).NotTo(BeNil())
+	case <-time.After(5 * time.Second):
+		t.Fatal("Execute did not return within 5s — timeout not applied")
+	}
+	close(journalIDChannel)
 }
