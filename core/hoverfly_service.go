@@ -407,18 +407,28 @@ func (hf *Hoverfly) ClearState() {
 }
 
 func (hf *Hoverfly) GetDiff() map[v2.SimpleRequestDefinitionView][]v2.DiffReport {
-	return hf.responsesDiff
+	hf.responsesDiffMu.RLock()
+	defer hf.responsesDiffMu.RUnlock()
+	snapshot := make(map[v2.SimpleRequestDefinitionView][]v2.DiffReport, len(hf.responsesDiff))
+	for k, v := range hf.responsesDiff {
+		snapshot[k] = append([]v2.DiffReport(nil), v...)
+	}
+	return snapshot
 }
 
 func (hf *Hoverfly) ClearDiff() {
+	hf.responsesDiffMu.Lock()
+	defer hf.responsesDiffMu.Unlock()
 	hf.responsesDiff = make(map[v2.SimpleRequestDefinitionView][]v2.DiffReport)
 }
 
 func (hf *Hoverfly) AddDiff(requestView v2.SimpleRequestDefinitionView, diffReport v2.DiffReport) {
-	if len(diffReport.DiffEntries) > 0 {
-		diffs := hf.responsesDiff[requestView]
-		hf.responsesDiff[requestView] = append(diffs, diffReport)
+	if len(diffReport.DiffEntries) == 0 {
+		return
 	}
+	hf.responsesDiffMu.Lock()
+	defer hf.responsesDiffMu.Unlock()
+	hf.responsesDiff[requestView] = append(hf.responsesDiff[requestView], diffReport)
 }
 
 func (hf *Hoverfly) GetPACFile() []byte {
@@ -437,9 +447,10 @@ func (hf *Hoverfly) DeletePACFile() {
 }
 
 func (hf *Hoverfly) GetFilteredDiff(diffFilterView v2.DiffFilterView) map[v2.SimpleRequestDefinitionView][]v2.DiffReport {
-	responsesDiff := hf.responsesDiff
+	hf.responsesDiffMu.RLock()
+	defer hf.responsesDiffMu.RUnlock()
 	filteredResponsesDiff := make(map[v2.SimpleRequestDefinitionView][]v2.DiffReport)
-	for request, diffReports := range responsesDiff {
+	for request, diffReports := range hf.responsesDiff {
 		for _, diffReport := range diffReports {
 			var filteredDiffEntries []v2.DiffReportEntry
 			for _, diffEntry := range diffReport.DiffEntries {

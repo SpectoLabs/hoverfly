@@ -5,6 +5,8 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
+	"sync"
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/action"
@@ -1065,6 +1067,62 @@ func Test_Hoverfly_AddDiff_DoesntAddDiffReport_NoEntries(t *testing.T) {
 	unit.AddDiff(key, v2.DiffReport{Timestamp: "now"})
 
 	Expect(unit.responsesDiff).To(HaveLen(0))
+}
+
+// Regression for GHSA-qrh4-p6v4-mrfg: concurrent AddDiff/GetDiff/ClearDiff
+// used to trip Go's built-in map race check and crash the process with
+// "fatal error: concurrent map read and map write". Run with -race to also
+// catch slice-aliasing regressions.
+func Test_Hoverfly_Diff_ConcurrentAccess(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	const writers = 32
+	const reads = 64
+	const writesPerGoroutine = 100
+
+	var wg sync.WaitGroup
+	wg.Add(writers + reads + 1)
+
+	for i := 0; i < writers; i++ {
+		go func(id int) {
+			defer wg.Done()
+			key := v2.SimpleRequestDefinitionView{
+				Host: "test.com",
+				Path: "/" + strconv.Itoa(id),
+			}
+			for j := 0; j < writesPerGoroutine; j++ {
+				unit.AddDiff(key, v2.DiffReport{
+					Timestamp:   "now",
+					DiffEntries: []v2.DiffReportEntry{{Actual: strconv.Itoa(j)}},
+				})
+			}
+		}(i)
+	}
+
+	for i := 0; i < reads; i++ {
+		go func() {
+			defer wg.Done()
+			for j := 0; j < writesPerGoroutine; j++ {
+				for _, reports := range unit.GetDiff() {
+					for _, r := range reports {
+						_ = r.Timestamp
+					}
+				}
+				_ = unit.GetFilteredDiff(v2.DiffFilterView{})
+			}
+		}()
+	}
+
+	go func() {
+		defer wg.Done()
+		for i := 0; i < writesPerGoroutine; i++ {
+			unit.ClearDiff()
+		}
+	}()
+
+	wg.Wait()
 }
 
 func Test_Hoverfly_GetPACFile_GetsPACFile(t *testing.T) {

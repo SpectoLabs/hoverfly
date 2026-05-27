@@ -47,6 +47,7 @@ type Hoverfly struct {
 	templator              *templating.Templator
 	PostServeActionDetails *action.PostServeActionDetails
 	responsesDiff          map[v2.SimpleRequestDefinitionView][]v2.DiffReport
+	responsesDiffMu        sync.RWMutex
 }
 
 func NewHoverfly() *Hoverfly {
