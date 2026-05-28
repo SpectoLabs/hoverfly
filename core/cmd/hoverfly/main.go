@@ -38,6 +38,7 @@ import (
 	hvc "github.com/SpectoLabs/hoverfly/core/certs"
 	cs "github.com/SpectoLabs/hoverfly/core/cors"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	mw "github.com/SpectoLabs/hoverfly/core/middleware"
 	"github.com/SpectoLabs/hoverfly/core/modes"
@@ -77,6 +78,7 @@ var (
 	synthesize    = flag.Bool("synthesize", false, "Start Hoverfly in synthesize mode (middleware is required)")
 	modify        = flag.Bool("modify", false, "Start Hoverfly in modify mode - applies middleware (required) to both outgoing and incoming HTTP traffic")
 	spy           = flag.Bool("spy", false, "Start Hoverfly in spy mode, similar to simulate but calls real server when cache miss")
+	captureOnMiss = flag.Bool("capture-on-miss", false, "Capture requests that don't match a simulation when in spy mode")
 	diff          = flag.Bool("diff", false, "Start Hoverfly in diff mode - calls real server and compares the actual response with the expected simulation config if present")
 	middleware    = flag.String("middleware", "", "Set middleware by passing the name of the binary and the path of the middleware script separated by space. (i.e. '-middleware \"python script.py\"')")
 	proxyPort     = flag.String("pp", "", "Proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
@@ -519,6 +521,15 @@ func main() {
 	}
 	hoverfly.Authentication = authBackend
 	hoverfly.HTTP = hv.GetDefaultHoverflyHTTPClient(hoverfly.Cfg.TLSVerification, hoverfly.Cfg.UpstreamProxy)
+
+	if *spy && *captureOnMiss {
+		if err := hoverfly.SetModeWithArguments(v2.ModeView{
+			Mode:      modes.Spy,
+			Arguments: v2.ModeArgumentsView{CaptureOnMiss: true},
+		}); err != nil {
+			log.WithError(err).Fatal("Failed to set spy mode with captureOnMiss")
+		}
+	}
 
 	// if add new user supplied - adding it to database
 	if *addNew || *authEnabled {

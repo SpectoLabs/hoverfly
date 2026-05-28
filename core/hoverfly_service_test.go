@@ -985,6 +985,22 @@ func Test_Hoverfly_SetModeWithArguments_OverwriteDuplicate(t *testing.T) {
 	Expect(storedMode.Arguments.OverwriteDuplicate).To(BeTrue())
 }
 
+func Test_Hoverfly_SetModeWithArguments_SpyCaptureOnMiss(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	Expect(unit.SetModeWithArguments(v2.ModeView{
+		Mode: "spy",
+		Arguments: v2.ModeArgumentsView{
+			CaptureOnMiss: true,
+		},
+	})).To(Succeed())
+
+	storedMode := unit.modeMap[modes.Spy].View()
+	Expect(storedMode.Arguments.CaptureOnMiss).To(BeTrue())
+}
+
 func Test_Hoverfly_AddDiff_AddEntry(t *testing.T) {
 	RegisterTestingT(t)
 
