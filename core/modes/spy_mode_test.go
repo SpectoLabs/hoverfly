@@ -14,10 +14,14 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type hoverflySpyStub struct{}
+type hoverflySpyStub struct {
+	savedRequest   *models.RequestDetails
+	savedResponse  *models.ResponseDetails
+	savedArguments *modes.ModeArguments
+}
 
 // DoRequest - Stub implementation of modes.HoverflySpy interface
-func (this hoverflySpyStub) DoRequest(request *http.Request) (*http.Response, *time.Duration, error) {
+func (this *hoverflySpyStub) DoRequest(request *http.Request) (*http.Response, *time.Duration, error) {
 	response := &http.Response{}
 	if request.Host == "error.com" {
 		return nil, nil, fmt.Errorf("Could not reach error.com")
@@ -30,7 +34,7 @@ func (this hoverflySpyStub) DoRequest(request *http.Request) (*http.Response, *t
 	return response, &duration, nil
 }
 
-func (this hoverflySpyStub) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError) {
+func (this *hoverflySpyStub) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError) {
 	if requestDetails.Destination == "positive-match.com" {
 		return &models.ResponseDetails{
 			Status: 200,
@@ -42,14 +46,17 @@ func (this hoverflySpyStub) GetResponse(requestDetails models.RequestDetails) (*
 	}
 }
 
-func (this hoverflySpyStub) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+func (this *hoverflySpyStub) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	if pair.Request.Path == "middleware-error" {
 		return pair, fmt.Errorf("middleware-error")
 	}
 	return pair, nil
 }
 
-func (this hoverflySpyStub) Save(request *models.RequestDetails, response *models.ResponseDetails, arguments *modes.ModeArguments) error {
+func (this *hoverflySpyStub) Save(request *models.RequestDetails, response *models.ResponseDetails, arguments *modes.ModeArguments) error {
+	this.savedRequest = request
+	this.savedResponse = response
+	this.savedArguments = arguments
 	return nil
 }
 
@@ -57,7 +64,7 @@ func Test_SpyMode_WhenGivenAMatchingRequestItReturnsTheCorrectResponse(t *testin
 	RegisterTestingT(t)
 
 	unit := &modes.SpyMode{
-		Hoverfly: hoverflySpyStub{},
+		Hoverfly: &hoverflySpyStub{},
 	}
 
 	request := models.RequestDetails{
@@ -74,7 +81,7 @@ func Test_SpyMode_WhenGivenANonMatchingRequestItWillMakeTheRequestAndReturnIt(t 
 	RegisterTestingT(t)
 
 	unit := &modes.SpyMode{
-		Hoverfly: hoverflySpyStub{},
+		Hoverfly: &hoverflySpyStub{},
 	}
 
 	requestDetails := models.RequestDetails{
@@ -100,7 +107,7 @@ func Test_SpyMode_WhenGivenAMatchingRequesAndMiddlewareFaislItReturnsAnError(t *
 	RegisterTestingT(t)
 
 	unit := &modes.SpyMode{
-		Hoverfly: hoverflySpyStub{},
+		Hoverfly: &hoverflySpyStub{},
 	}
 
 	request := models.RequestDetails{
@@ -124,7 +131,7 @@ func Test_SpyMode_ShouldReturnErrorOnRemoteServiceCall(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := &modes.SpyMode{
-		Hoverfly: hoverflySpyStub{},
+		Hoverfly: &hoverflySpyStub{},
 	}
 
 	requestDetails := models.RequestDetails{
@@ -146,4 +153,56 @@ func Test_SpyMode_ShouldReturnErrorOnRemoteServiceCall(t *testing.T) {
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when forwarding the request to the intended destination"))
 	Expect(string(responseBody)).To(ContainSubstring("Could not reach error.com"))
 
+}
+
+func Test_SpyMode_OnCacheMiss_WhenCaptureOnMissEnabled_SavesRequestAndResponse(t *testing.T) {
+	RegisterTestingT(t)
+
+	stub := &hoverflySpyStub{}
+	unit := &modes.SpyMode{
+		Hoverfly:  stub,
+		Arguments: modes.ModeArguments{CaptureOnMiss: true},
+	}
+
+	requestDetails := models.RequestDetails{
+		Scheme:      "http",
+		Destination: "negative-match.com",
+	}
+
+	request, err := http.NewRequest("GET", "http://negative-match.com", nil)
+	Expect(err).To(BeNil())
+
+	result, err := unit.Process(request, requestDetails)
+	Expect(err).To(BeNil())
+	Expect(result.Response.StatusCode).To(Equal(200))
+
+	Expect(stub.savedRequest).ToNot(BeNil())
+	Expect(stub.savedResponse).ToNot(BeNil())
+	Expect(stub.savedResponse.Status).To(Equal(200))
+	Expect(stub.savedResponse.Body).To(Equal("test"))
+}
+
+func Test_SpyMode_OnCacheMiss_WhenCaptureOnMissDisabled_DoesNotSave(t *testing.T) {
+	RegisterTestingT(t)
+
+	stub := &hoverflySpyStub{}
+	unit := &modes.SpyMode{
+		Hoverfly:  stub,
+		Arguments: modes.ModeArguments{CaptureOnMiss: false},
+	}
+
+	requestDetails := models.RequestDetails{
+		Scheme:      "http",
+		Destination: "negative-match.com",
+	}
+
+	request, err := http.NewRequest("GET", "http://negative-match.com", nil)
+	Expect(err).To(BeNil())
+
+	result, err := unit.Process(request, requestDetails)
+	Expect(err).To(BeNil())
+	Expect(result.Response.StatusCode).To(Equal(200))
+
+	Expect(stub.savedRequest).To(BeNil())
+	Expect(stub.savedResponse).To(BeNil())
 }
