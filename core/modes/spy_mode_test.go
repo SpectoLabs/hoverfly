@@ -180,6 +180,8 @@ func Test_SpyMode_OnCacheMiss_WhenCaptureOnMissEnabled_SavesRequestAndResponse(t
 	Expect(stub.savedResponse).ToNot(BeNil())
 	Expect(stub.savedResponse.Status).To(Equal(200))
 	Expect(stub.savedResponse.Body).To(Equal("test"))
+	Expect(stub.savedArguments).ToNot(BeNil())
+	Expect(stub.savedArguments.CaptureOnMiss).To(BeTrue())
 }
 
 func Test_SpyMode_OnCacheMiss_WhenCaptureOnMissDisabled_DoesNotSave(t *testing.T) {
