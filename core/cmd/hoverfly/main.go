@@ -522,15 +522,6 @@ func main() {
 	hoverfly.Authentication = authBackend
 	hoverfly.HTTP = hv.GetDefaultHoverflyHTTPClient(hoverfly.Cfg.TLSVerification, hoverfly.Cfg.UpstreamProxy)
 
-	if *spy && *captureOnMiss {
-		if err := hoverfly.SetModeWithArguments(v2.ModeView{
-			Mode:      modes.Spy,
-			Arguments: v2.ModeArgumentsView{CaptureOnMiss: true},
-		}); err != nil {
-			log.WithError(err).Fatal("Failed to set spy mode with captureOnMiss")
-		}
-	}
-
 	// if add new user supplied - adding it to database
 	if *addNew || *authEnabled {
 		var err error
@@ -687,6 +678,19 @@ func main() {
 			}
 		}
 		hoverfly.CacheMatcher.PreloadCache(hoverfly.Simulation)
+	}
+
+	if *captureOnMiss && !*spy {
+		log.Fatal("-capture-on-miss can only be used with -spy mode")
+	}
+
+	if *spy && *captureOnMiss {
+		if err := hoverfly.SetModeWithArguments(v2.ModeView{
+			Mode:      modes.Spy,
+			Arguments: v2.ModeArgumentsView{CaptureOnMiss: true},
+		}); err != nil {
+			log.WithError(err).Fatal("Failed to set spy mode with captureOnMiss")
+		}
 	}
 
 	// start metrics registry flush

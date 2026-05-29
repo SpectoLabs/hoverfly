@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
@@ -125,6 +126,66 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 				body, err := ioutil.ReadAll(resp.Body)
 				Expect(err).To(BeNil())
 				Expect(string(body)).To(Equal("Simulated"))
+			})
+		})
+
+		Context("With capture-on-miss enabled", func() {
+
+			var fakeServer *httptest.Server
+
+			BeforeEach(func() {
+				hoverfly.Start()
+
+				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "text/plain")
+					w.Write([]byte("Real response"))
+				}))
+
+				hoverfly.SetModeWithArgs("spy", v2.ModeArgumentsView{CaptureOnMiss: true})
+				hoverfly.ImportSimulation(`{
+				"data": {
+					"pairs": [
+						{
+							"request": {
+								"headers": {
+								  "X-API-TEST": [ { "value": "test", "matcher": "exact" } ]
+								}
+							},
+							"response": {
+								"status": 200,
+								"body": "Simulated"
+							}
+						}
+					]
+				},
+				"meta": { "schemaVersion": "v5" }
+			}`)
+			})
+
+			AfterEach(func() {
+				fakeServer.Close()
+			})
+
+			It("Should save the request/response pair when there is a cache miss", func() {
+				resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL))
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+				body, err := ioutil.ReadAll(resp.Body)
+				Expect(err).To(BeNil())
+				Expect(string(body)).To(Equal("Real response"))
+
+				simulation := hoverfly.ExportSimulation()
+				Expect(simulation.RequestResponsePairs).To(HaveLen(2))
+			})
+
+			It("Should not save the request/response pair when there is a cache hit", func() {
+				resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL).Set("X-API-TEST", "test"))
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+				body, err := ioutil.ReadAll(resp.Body)
+				Expect(err).To(BeNil())
+				Expect(string(body)).To(Equal("Simulated"))
+
+				simulation := hoverfly.ExportSimulation()
+				Expect(simulation.RequestResponsePairs).To(HaveLen(1))
 			})
 		})
 	})
