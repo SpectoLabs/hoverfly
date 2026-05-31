@@ -48,13 +48,30 @@ Poll once per minute until **all 7** expected zip bundles appear in the release 
 - `hoverfly_bundle_linux_386.zip`
 - `hoverfly_bundle_linux_arm64.zip`
 
-To check, run:
+To check, run this (counts how many of the 7 expected bundles are present).
+It is shell-agnostic — works in sh, bash, and zsh:
 ```
-gh release view $ARGUMENTS --json assets --jq '.assets[].name'
+gh release view $ARGUMENTS --json assets --jq '.assets[].name' > /tmp/hf_release_assets.txt
+printf '%s\n' \
+  hoverfly_bundle_OSX_amd64.zip \
+  hoverfly_bundle_OSX_arm64.zip \
+  hoverfly_bundle_windows_amd64.zip \
+  hoverfly_bundle_windows_386.zip \
+  hoverfly_bundle_linux_amd64.zip \
+  hoverfly_bundle_linux_386.zip \
+  hoverfly_bundle_linux_arm64.zip \
+  | grep -Fxf - /tmp/hf_release_assets.txt | wc -l | xargs
 ```
 
+> NOTE: Keep the count shell-agnostic. The command above relies only on POSIX
+> features (`printf`, a pipe, `grep -Fxf -` reading patterns from stdin, a temp
+> file) — no process substitution `<(...)`, no arrays, no unquoted word-splitting.
+> Do NOT count with `for e in $expected; do grep -qx "$e"; done`: in zsh,
+> unquoted `$expected` is NOT word-split, so the loop runs once over the whole
+> string and always reports `0/7`.
+
 Each poll iteration:
-- Count how many of the 7 expected files are present
+- Run the command above to get the count (0–7)
 - Report progress to the user: "X/7 assets uploaded..."
 - Sleep 60 seconds between checks
 - After 45 minutes with no completion, warn the user and ask whether to keep waiting
