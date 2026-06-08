@@ -89,7 +89,7 @@ Matchers operate per HTTP field (method, path, query, headers, body, scheme, des
 
 ## Tech Stack
 
-- **Go 1.26.3**, modules in `go.mod`
+- **Go 1.26.4**, modules in `go.mod`
 - **Proxy:** `github.com/SpectoLabs/goproxy` (custom MITM fork)
 - **CLI:** `cobra` + `viper`
 - **Routing (admin API):** `gorilla/mux`, `go-zoo/bone`
