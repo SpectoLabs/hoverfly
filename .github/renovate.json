@@ -36,6 +36,18 @@
       ],
       "datasourceTemplate": "golang-version",
       "depNameTemplate": "go"
+    },
+    {
+      "customType": "regex",
+      "description": "Update Go version in go.mod go directive",
+      "managerFilePatterns": [
+        "/^go\\.mod$/"
+      ],
+      "matchStrings": [
+        "(?m)^go (?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "golang-version",
+      "depNameTemplate": "go"
     }
   ],
   "packageRules": [
