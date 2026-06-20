@@ -108,9 +108,9 @@ func float64exp(f float64) int {
 }
 
 // AppendFloat appends a float to `b` with precision `prec`. It returns the new slice and whether successful or not. Precision is the number of decimals to display, thus prec + 1 == number of significant digits.
-func AppendFloat(b []byte, f float64, prec int) ([]byte, bool) {
+func AppendFloat(b []byte, f float64, prec int) []byte {
 	if math.IsNaN(f) || math.IsInf(f, 0) {
-		return b, false
+		return b
 	}
 
 	neg := false
@@ -129,7 +129,7 @@ func AppendFloat(b []byte, f float64, prec int) ([]byte, bool) {
 	mantLen := LenInt(mant)
 	mantExp := mantLen - prec - 1
 	if mant == 0 {
-		return append(b, '0'), true
+		return append(b, '0')
 	}
 
 	// expLen is zero for positive exponents, because positive exponents are determined later on in the big conversion loop
@@ -253,5 +253,5 @@ func AppendFloat(b []byte, f float64, prec int) ([]byte, bool) {
 			}
 		}
 	}
-	return b[:i], true
+	return b[:i]
 }

@@ -37,3 +37,5 @@ cd -
 #cd ../bindings/py
 #make publish
 #cd -
+
+rm -f v$VERSION.tar.gz

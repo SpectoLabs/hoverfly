@@ -16,6 +16,7 @@ parse/tests/*/corpus/*
 bindings/js/build
 bindings/js/.cache
 bindings/js/node_modules
+bindings/js/pnpm-lock.yaml
 bindings/js/example/package-lock.json
 bindings/js/example/node_modules
 bindings/js/example/test.min.html

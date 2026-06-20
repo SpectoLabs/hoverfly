@@ -66,7 +66,7 @@ func Walk(hfs http.FileSystem, root string, walkFn filepath.WalkFunc) error {
 }
 
 // ReadFile reads the contents of the file of hfs specified by name.
-// Just as ioutil.ReadFile does.
+// Just as os.ReadFile does.
 func ReadFile(hfs http.FileSystem, name string) ([]byte, error) {
 	fh, err := hfs.Open(name)
 	if err != nil {
