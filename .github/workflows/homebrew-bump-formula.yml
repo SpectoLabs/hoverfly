@@ -25,6 +25,11 @@ jobs:
     steps:
     - name: Update Homebrew formula
       uses: dawidd6/action-homebrew-bump-formula@v6
+      env:
+       # Homebrew 6.0 (tap-trust enforcement, Homebrew/brew#22470) refuses to load
+       # formulae from untrusted third-party taps. This restores the prior behaviour
+       # so the action can load SpectoLabs/homebrew-tap in CI.
+       HOMEBREW_NO_REQUIRE_TAP_TRUST: "1"
       with:
        # Required, custom GitHub access token with the 'public_repo' and 'workflow' scopes
        token: ${{ secrets.HOME_BREW_PAT }}
