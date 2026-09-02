@@ -26,12 +26,12 @@
       "globalActions": {
          "delays": [
             {
-               "urlPattern": "time\\.jsontest\\.com",
+                "urlPattern": "api\\.ipify\\.org",
                "httpMethod": "",
                "delay": 1000
             },
             {
-               "urlPattern": "date\\.jsontest\\.com",
+               "urlPattern": "httpbin\\.org",
                "httpMethod": "",
                "delay": 2000
             }
