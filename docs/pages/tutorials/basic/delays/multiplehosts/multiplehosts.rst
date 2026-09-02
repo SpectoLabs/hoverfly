@@ -1,7 +1,7 @@
 Applying different delays based on host
 =======================================
 
-Now let's apply a delay of 1 second on responses from ``time.jsontest.com`` and a delay of 2 seconds on responses from ``date.jsontest.com``.
+Now let's apply a delay of 1 second on responses from ``api.ipify.org`` and a delay of 2 seconds on responses from ``httpbin.org``.
 
 Run the following to create and export a simulation.
 
@@ -20,7 +20,7 @@ Now run the following to import the edited ``simulation.json`` file and run the 
 .. literalinclude:: delays-simulate.sh
    :language: sh
 
-You should notice a 1 second delay on responses from ``time.jsontest.com``, and a 2 second delay on responses from ``date.jsontest.com``.
+You should notice a 1 second delay on responses from ``api.ipify.org``, and a 2 second delay on responses from ``httpbin.org``.
 
 
 .. note::
