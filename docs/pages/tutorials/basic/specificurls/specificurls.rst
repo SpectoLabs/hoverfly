@@ -10,8 +10,8 @@ will filter out URLs as required.
 .. literalinclude:: filter-dest-dry-run.sh
     :language: sh
 
-This tells us that setting the destination to ``ip`` will allow the URL ``https://api.ipify.org`` to be captured or simulated, while the URL
-``https://httpbin.org`` will be ignored.
+This tells us that setting the destination to ``ip`` will allow the URL ``http://api.ipify.org`` to be captured or simulated, while the URL
+``http://httpbin.org`` will be ignored.
 
 
 Now we have checked the destination setting, we can apply it to filter out the URLs we don't want to capture.
@@ -19,7 +19,7 @@ Now we have checked the destination setting, we can apply it to filter out the U
 .. literalinclude:: filter-dest.sh
     :language: sh
 
-If we examine the logs and the ``simulation.json`` file, we can see that `only` a request response pair to the ``https://api.ipify.org``
+If we examine the logs and the ``simulation.json`` file, we can see that `only` a request response pair to the ``http://api.ipify.org``
 URL has been captured.
 
 The destination setting can be either a string or a regular expression. 

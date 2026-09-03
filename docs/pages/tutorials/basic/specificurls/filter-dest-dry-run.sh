@@ -1,4 +1,4 @@
 hoverctl start
-hoverctl destination "ip" --dry-run https://api.ipify.org
-hoverctl destination "ip" --dry-run https://httpbin.org
+hoverctl destination "ip" --dry-run http://api.ipify.org
+hoverctl destination "ip" --dry-run http://httpbin.org
 hoverctl stop
