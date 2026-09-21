@@ -72,6 +72,22 @@
         "go",
         "dependencies"
       ]
+    },
+    {
+      "description": "Enable Go module updates, grouped into one PR",
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchDepTypes": [
+        "require",
+        "indirect"
+      ],
+      "enabled": true,
+      "groupName": "Go modules",
+      "postUpdateOptions": [
+        "gomodTidy",
+        "gomodVendor"
+      ]
     }
   ]
 }
