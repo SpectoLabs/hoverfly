@@ -64,8 +64,8 @@ func ParseDecimal(b []byte) (float64, int) {
 	f := sign * float64(n)
 	if 0 <= exp && exp < 23 {
 		return f * float64pow10[exp], i
-	} else if 23 < exp && exp < 0 {
-		return f / float64pow10[exp], i
+	} else if -22 <= exp && exp < 0 { // int / 10^k
+		return f / float64pow10[-exp], i
 	}
 	return f * math.Pow10(exp), i
 }

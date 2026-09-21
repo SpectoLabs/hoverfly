@@ -153,6 +153,13 @@ func (m *M) AddFunc(mimetype string, minifier MinifierFunc) {
 // AddRegexp adds a minifier to the mimetype => function map (unsafe for concurrent use).
 func (m *M) AddRegexp(pattern *regexp.Regexp, minifier Minifier) {
 	m.mutex.Lock()
+	for i := range m.pattern {
+		if m.pattern[i].pattern.String() == pattern.String() {
+			m.pattern[i] = patternMinifier{pattern, minifier}
+			m.mutex.Unlock()
+			return
+		}
+	}
 	m.pattern = append(m.pattern, patternMinifier{pattern, minifier})
 	m.mutex.Unlock()
 }
@@ -160,6 +167,13 @@ func (m *M) AddRegexp(pattern *regexp.Regexp, minifier Minifier) {
 // AddFuncRegexp adds a minify function to the mimetype => function map (unsafe for concurrent use).
 func (m *M) AddFuncRegexp(pattern *regexp.Regexp, minifier MinifierFunc) {
 	m.mutex.Lock()
+	for i := range m.pattern {
+		if m.pattern[i].pattern.String() == pattern.String() {
+			m.pattern[i] = patternMinifier{pattern, minifier}
+			m.mutex.Unlock()
+			return
+		}
+	}
 	m.pattern = append(m.pattern, patternMinifier{pattern, minifier})
 	m.mutex.Unlock()
 }
@@ -288,14 +302,12 @@ func (z *writer) Close() error {
 func (m *M) Writer(mediatype string, w io.Writer) io.WriteCloser {
 	pr, pw := io.Pipe()
 	z := &writer{pw, sync.WaitGroup{}, false, nil}
-	z.wg.Add(1)
-	go func() {
-		defer z.wg.Done()
+	z.wg.Go(func() {
 		defer pr.Close()
 		if err := m.Minify(mediatype, w, pr); err != nil {
 			z.err = err
 		}
-	}()
+	})
 	return z
 }
 
@@ -327,14 +339,12 @@ func (w *responseWriter) Write(b []byte) (int, error) {
 		if _, params, minifier := w.m.Match(w.mediatype); minifier != nil {
 			pr, pw := io.Pipe()
 			z := &writer{pw, sync.WaitGroup{}, false, nil}
-			z.wg.Add(1)
-			go func() {
-				defer z.wg.Done()
+			z.wg.Go(func() {
 				defer pr.Close()
 				if err := minifier(w.m, w.ResponseWriter, pr, params); err != nil {
 					z.err = err
 				}
-			}()
+			})
 			w.z = z
 		} else {
 			w.z = w.ResponseWriter

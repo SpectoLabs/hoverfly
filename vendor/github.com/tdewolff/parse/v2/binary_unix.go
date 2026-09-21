@@ -15,18 +15,12 @@ type binaryReaderMmap struct {
 	size int64
 }
 
-func newBinaryReaderMmap(filename string) (*binaryReaderMmap, error) {
-	f, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
+func newBinaryReaderMmap(f *os.File) (*binaryReaderMmap, error) {
 	info, err := f.Stat()
 	if err != nil {
 		return nil, err
 	} else if !info.Mode().IsRegular() {
-		return nil, fmt.Errorf("mmap: not a regular file: %v", filename)
+		return nil, fmt.Errorf("mmap: not a regular file: %v", info.Name())
 	}
 
 	size := info.Size()
@@ -40,9 +34,9 @@ func newBinaryReaderMmap(filename string) (*binaryReaderMmap, error) {
 			data: make([]byte, 0),
 		}, nil
 	} else if size < 0 {
-		return nil, fmt.Errorf("mmap: file %s has negative size", filename)
+		return nil, fmt.Errorf("mmap: file %s has negative size", info.Name())
 	} else if size != int64(int(size)) {
-		return nil, fmt.Errorf("mmap: file %s is too large", filename)
+		return nil, fmt.Errorf("mmap: file %s is too large", info.Name())
 	}
 
 	data, err := syscall.Mmap(int(f.Fd()), 0, int(size), syscall.PROT_READ, syscall.MAP_SHARED)
@@ -94,10 +88,25 @@ func (r *binaryReaderMmap) Bytes(b []byte, n, off int64) ([]byte, error) {
 	return b[:len(data)], err
 }
 
-func NewBinaryReaderMmap(filename string) (*BinaryReader, error) {
-	f, err := newBinaryReaderMmap(filename)
+func NewBinaryReaderMmapPath(filename string) (*BinaryReader, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	} else if mmap, err := newBinaryReaderMmap(f); err != nil {
+		f.Close()
+		return nil, err
+	} else if err := f.Close(); err != nil {
+		mmap.Close()
+		return nil, err
+	} else {
+		return NewBinaryReader(mmap), nil
+	}
+}
+
+func NewBinaryReaderMmapFile(f *os.File) (*BinaryReader, error) {
+	file, err := newBinaryReaderMmap(f)
 	if err != nil {
 		return nil, err
 	}
-	return NewBinaryReader(f), nil
+	return NewBinaryReader(file), nil
 }
