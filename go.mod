@@ -11,22 +11,22 @@ require (
 	github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496
 	github.com/beevik/etree v1.8.0
 	github.com/boltdb/bolt v1.3.1
-	github.com/brianvoe/gofakeit/v6 v6.28.0
-	github.com/codegangsta/negroni v1.0.0
+	github.com/brianvoe/gofakeit/v7 v7.18.0
+	github.com/codegangsta/negroni/v3 v3.1.1
 	github.com/dghubble/sling v1.4.2
 	github.com/dsnet/compress v0.0.1
 	github.com/go-playground/validator/v10 v10.30.5
 	github.com/go-zoo/bone v1.3.0
-	github.com/golang-jwt/jwt/v4 v4.5.2
+	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
-	github.com/hashicorp/golang-lru v1.0.2
+	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/icrowley/fake v0.0.0-20240710202011-f797eb4a99c0
 	github.com/jackwakefield/gopac v1.0.3-0.20180823145755-c4d2e0b9a672
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/olekukonko/tablewriter v1.1.5
-	github.com/onsi/ginkgo v1.16.5
+	github.com/onsi/ginkgo/v2 v2.33.1
 	github.com/onsi/gomega v1.43.1
 	github.com/pborman/uuid v1.2.1
 	github.com/phayes/freeport v0.0.0-20220201140144-74d24b5ae9f5
@@ -42,7 +42,7 @@ require (
 	golang.org/x/crypto v0.57.0
 	golang.org/x/term v0.46.0
 	gonum.org/v1/gonum v0.17.0
-	gopkg.in/yaml.v2 v2.4.0
+	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/client-go v0.36.2
 )
 
@@ -86,6 +86,6 @@ require (
 	golang.org/x/net v0.58.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
-	gopkg.in/sourcemap.v1 v1.0.5 // indirect
+	gopkg.in/sourcemap.v2 v2.1.4 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
