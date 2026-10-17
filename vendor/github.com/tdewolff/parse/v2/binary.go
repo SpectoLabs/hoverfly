@@ -63,10 +63,15 @@ func (r *binaryReaderBytes) Bytes(b []byte, n, off int64) ([]byte, error) {
 type binaryReaderReader struct {
 	r         io.Reader
 	pos, size int64
+	mu        sync.Mutex
 }
 
 func newBinaryReaderReader(r io.Reader, n int64) *binaryReaderReader {
-	return &binaryReaderReader{r, 0, n}
+	return &binaryReaderReader{
+		r:    r,
+		pos:  0,
+		size: n,
+	}
 }
 
 // Close closes the reader.
@@ -83,9 +88,12 @@ func (r *binaryReaderReader) Len() int64 {
 }
 
 func (r *binaryReaderReader) Bytes(b []byte, n, off int64) ([]byte, error) {
+	r.mu.Lock()
 	if off != r.pos {
+		r.mu.Unlock()
 		return nil, errors.New("reader: does not implement io.Seeker or io.ReaderAt")
 	} else if n == 0 {
+		r.mu.Unlock()
 		return nil, nil
 	} else if b == nil {
 		b = make([]byte, n)
@@ -96,11 +104,14 @@ func (r *binaryReaderReader) Bytes(b []byte, n, off int64) ([]byte, error) {
 		r.pos += int64(m)
 		i += m
 		if err != nil {
+			r.mu.Unlock()
 			return b[:i], err
 		} else if m == 0 {
+			r.mu.Unlock()
 			return b[:i], errors.New("reader: could not read all bytes")
 		}
 	}
+	r.mu.Unlock()
 	return b, nil
 }
 
@@ -278,8 +289,12 @@ func (r *BinaryReader) IBinaryReader() IBinaryReader {
 }
 
 func (r *BinaryReader) Clone() *BinaryReader {
+	f := r.f
+	if cloner, ok := f.(interface{ Clone() IBinaryReader }); ok {
+		f = cloner.Clone()
+	}
 	return &BinaryReader{
-		f:         r.f,
+		f:         f,
 		pos:       r.pos,
 		err:       r.err,
 		ByteOrder: r.ByteOrder,
@@ -329,7 +344,7 @@ func (r *BinaryReader) Seek(off int64, whence int) (int64, error) {
 		if off < -r.f.Len() || 0 < off {
 			return 0, fmt.Errorf("invalid offset")
 		}
-		r.pos = r.f.Len() - off
+		r.pos = r.f.Len() + off
 	} else {
 		return 0, fmt.Errorf("invalid whence")
 	}
@@ -385,7 +400,7 @@ func (r *BinaryReader) ReadUint8() uint8 {
 // ReadUint16 reads a uint16.
 func (r *BinaryReader) ReadUint16() uint16 {
 	data := r.ReadBytes(2)
-	if data == nil {
+	if len(data) < 2 {
 		return 0
 	} else if r.ByteOrder == binary.LittleEndian {
 		return uint16(data[1])<<8 | uint16(data[0])
@@ -396,7 +411,7 @@ func (r *BinaryReader) ReadUint16() uint16 {
 // ReadUint24 reads a uint24 into a uint32.
 func (r *BinaryReader) ReadUint24() uint32 {
 	b := r.ReadBytes(3)
-	if b == nil {
+	if len(b) < 3 {
 		return 0
 	} else if r.ByteOrder == binary.LittleEndian {
 		return uint32(b[0]) | uint32(b[1])<<8 | uint32(b[2])<<16
@@ -408,7 +423,7 @@ func (r *BinaryReader) ReadUint24() uint32 {
 // ReadUint32 reads a uint32.
 func (r *BinaryReader) ReadUint32() uint32 {
 	data := r.ReadBytes(4)
-	if data == nil {
+	if len(data) < 4 {
 		return 0
 	} else if r.ByteOrder == binary.LittleEndian {
 		return uint32(data[3])<<24 | uint32(data[2])<<16 | uint32(data[1])<<8 | uint32(data[0])
@@ -419,7 +434,7 @@ func (r *BinaryReader) ReadUint32() uint32 {
 // ReadUint64 reads a uint64.
 func (r *BinaryReader) ReadUint64() uint64 {
 	data := r.ReadBytes(8)
-	if data == nil {
+	if len(data) < 8 {
 		return 0
 	} else if r.ByteOrder == binary.LittleEndian {
 		return uint64(data[7])<<56 | uint64(data[6])<<48 | uint64(data[5])<<40 | uint64(data[4])<<32 | uint64(data[3])<<24 | uint64(data[2])<<16 | uint64(data[1])<<8 | uint64(data[0])
@@ -439,7 +454,8 @@ func (r *BinaryReader) ReadInt16() int16 {
 
 // ReadInt24 reads a int24 into an int32.
 func (r *BinaryReader) ReadInt24() int32 {
-	return int32(r.ReadUint24())
+	// no int24 to convert through, so sign-extend from bit 23
+	return int32(r.ReadUint24()<<8) >> 8
 }
 
 // ReadInt32 reads a int32.

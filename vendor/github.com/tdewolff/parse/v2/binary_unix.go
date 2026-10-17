@@ -75,7 +75,7 @@ func (r *binaryReaderMmap) Bytes(b []byte, n, off int64) ([]byte, error) {
 		return nil, fmt.Errorf("mmap: invalid range %d--%d", off, off+n)
 	} else if int64(len(r.data)) <= off {
 		return nil, io.EOF
-	} else if int64(len(r.data))-off <= n {
+	} else if int64(len(r.data))-off < n {
 		n = int64(len(r.data)) - off
 		err = io.EOF
 	}

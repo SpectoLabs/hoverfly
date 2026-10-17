@@ -14,6 +14,7 @@ import (
 	"os/exec"
 	"path"
 	"regexp"
+	"slices"
 	"strings"
 	"sync"
 
@@ -62,6 +63,7 @@ var cmdArgExtension = regexp.MustCompile(`^\.[0-9a-zA-Z]+`)
 func (c *cmdMinifier) Minify(_ *M, w io.Writer, r io.Reader, _ map[string]string) error {
 	cmd := &exec.Cmd{}
 	*cmd = *c.cmd // concurrency safety
+	cmd.Args = slices.Clone(c.cmd.Args)
 
 	var in, out *os.File
 	for i, arg := range cmd.Args {
@@ -99,8 +101,6 @@ func (c *cmdMinifier) Minify(_ *M, w io.Writer, r io.Reader, _ map[string]string
 	}
 	if out == nil {
 		cmd.Stdout = w
-	} else {
-		defer io.Copy(w, out)
 	}
 	stderr := &bytes.Buffer{}
 	cmd.Stderr = stderr
@@ -111,6 +111,12 @@ func (c *cmdMinifier) Minify(_ *M, w io.Writer, r io.Reader, _ map[string]string
 			err = fmt.Errorf("%s", stderr.String())
 		}
 		err = fmt.Errorf("command %s failed: %w", cmd.Path, err)
+	}
+	if out != nil {
+		_, copyErr := io.Copy(w, out)
+		if err == nil {
+			return copyErr
+		}
 	}
 	return err
 }
@@ -242,20 +248,20 @@ func (m *M) MinifyMimetype(mimetype []byte, w io.Writer, r io.Reader, params map
 
 // Bytes minifies an array of bytes (safe for concurrent use). When an error occurs it return the original array and the error.
 // It returns an error when no such mimetype exists (ErrNotExist) or any error occurred in the minifier function.
-func (m *M) Bytes(mediatype string, v []byte) ([]byte, error) {
-	out := buffer.NewWriter(make([]byte, 0, len(v)))
-	if err := m.Minify(mediatype, out, buffer.NewReader(v)); err != nil {
-		return v, err
+func (m *M) Bytes(mediatype string, b []byte) ([]byte, error) {
+	out := buffer.NewWriter(make([]byte, 0, len(b))) // TODO: reuse input buffer, make sure minifiers NEVER make output longer, need tests
+	if err := m.Minify(mediatype, out, buffer.NewReader(b)); err != nil {
+		return b, err
 	}
 	return out.Bytes(), nil
 }
 
 // String minifies a string (safe for concurrent use). When an error occurs it return the original string and the error.
 // It returns an error when no such mimetype exists (ErrNotExist) or any error occurred in the minifier function.
-func (m *M) String(mediatype string, v string) (string, error) {
-	out := buffer.NewWriter(make([]byte, 0, len(v)))
-	if err := m.Minify(mediatype, out, buffer.NewReader([]byte(v))); err != nil {
-		return v, err
+func (m *M) String(mediatype string, s string) (string, error) {
+	out := buffer.NewWriter(make([]byte, 0, len(s))) // TODO: reuse input buffer, make sure minifiers NEVER make output longer, need tests
+	if err := m.Minify(mediatype, out, strings.NewReader(s)); err != nil {
+		return s, err
 	}
 	return string(out.Bytes()), nil
 }
