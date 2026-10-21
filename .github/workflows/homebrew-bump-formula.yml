@@ -24,7 +24,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - name: Update Homebrew formula
-      uses: dawidd6/action-homebrew-bump-formula@v6
+      uses: dawidd6/action-homebrew-bump-formula@v10
       env:
        # Homebrew 6.0 (tap-trust enforcement, Homebrew/brew#22470) refuses to load
        # formulae from untrusted third-party taps. This restores the prior behaviour
