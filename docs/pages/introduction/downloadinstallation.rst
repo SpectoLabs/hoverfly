@@ -74,31 +74,29 @@ configure hoverctl to use the newly started Hoverfly Docker instance as a new ta
 Kubernetes
 ~~~~~~~~~~
 
-You can use `Helm <https://helm.sh/>`_ to install Hoverfly directly to your Kubernetes cluster. Hoverfly chart is available from the
-official Helm incubator repo.
+You can use `Helm <https://helm.sh/>`_ to install Hoverfly directly to your Kubernetes cluster. A community-maintained
+chart is available on `Artifact Hub <https://artifacthub.io/packages/helm/hoverfly/hoverfly>`_.
 
-Use ``helm repo add`` to add the incubator repo if you haven't done so:
+Use ``helm repo add`` to add the chart repository:
 
 .. code:: bash
 
-    helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-
+    helm repo add hoverfly https://afruktin.github.io/hoverfly-helm
 
 Here is the command for a basic Hoverfly installation with the default settings:
 
 .. code:: bash
 
-    helm install incubator/hoverfly
+    helm install hoverfly hoverfly/hoverfly
 
-The default installation create a ``ClusterIP`` type service, which makes it only reachable from within the cluster.
+The default installation runs Hoverfly in webserver mode and creates a ``ClusterIP`` type service, which makes it only
+reachable from within the cluster.
 
 After the installation, you can use port forwarding to access the application on localhost:
 
 .. code:: bash
 
-    kubectl port-forward $HOVERFLY_POD_NAME 8888 8500
+    kubectl port-forward svc/hoverfly 8888 8500
 
-You can find the ``HOVERFLY_POD_NAME`` by doing ``kubectl get pod``
-
-See more details on `Helm Charts project <https://github.com/helm/charts/tree/master/incubator/hoverfly>`_.
+See more details in the `chart documentation <https://github.com/afruktin/hoverfly-helm/tree/main/charts/hoverfly>`_.
 
