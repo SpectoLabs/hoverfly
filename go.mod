@@ -1,6 +1,6 @@
 module github.com/SpectoLabs/hoverfly
 
-go 1.27.2
+go 1.27.3
 
 require (
 	github.com/ChrisTrenkamp/xsel v0.9.16
