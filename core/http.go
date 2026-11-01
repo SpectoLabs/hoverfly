@@ -74,9 +74,11 @@ func GetHttpClient(hf *Hoverfly, host string) (*http.Client, error) {
 				return nil, errors.New("Unable to load client certs file\n\n" + err.Error())
 			}
 
-			caCertPool := x509.NewCertPool()
-
-			var tlsConfig *tls.Config
+			// Without a CA cert, RootCAs is left nil so the system roots are used
+			tlsConfig := &tls.Config{
+				Certificates:       []tls.Certificate{cert},
+				InsecureSkipVerify: !hf.Cfg.TLSVerification,
+			}
 
 			if hf.Cfg.ClientAuthenticationCACert != "" {
 				// Load CA cert
@@ -86,21 +88,10 @@ func GetHttpClient(hf *Hoverfly, host string) (*http.Client, error) {
 					return nil, errors.New("Unable to load ca certs file\n\n" + err.Error())
 				}
 
+				caCertPool := x509.NewCertPool()
 				caCertPool.AppendCertsFromPEM(caCert)
-
-				tlsConfig = &tls.Config{
-					Certificates: []tls.Certificate{cert},
-					RootCAs:      caCertPool,
-				}
-			} else {
-				tlsConfig = &tls.Config{
-					Certificates:       []tls.Certificate{cert},
-					RootCAs:            caCertPool,
-					InsecureSkipVerify: true,
-				}
+				tlsConfig.RootCAs = caCertPool
 			}
-
-			tlsConfig.BuildNameToCertificate()
 
 			transport := &http.Transport{TLSClientConfig: tlsConfig}
 			client := &http.Client{Transport: transport}
