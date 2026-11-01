@@ -180,3 +180,7 @@ urls to allow body files to be downloaded from. For the above to work you need t
 .. code:: bash
 
     hoverfly -response-body-files-allow-origin="https://raw.githubusercontent.com/"
+
+A bodyFile URL is allowed only if its scheme, host and port exactly match one of the allowed origins. If an allowed
+origin includes a path, such as :code:`https://raw.githubusercontent.com/SpectoLabs/`, the URL must also be under that
+path. URLs containing user info are rejected, and redirects are only followed to URLs that are also allowed.

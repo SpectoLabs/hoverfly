@@ -12,6 +12,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"path"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -565,6 +566,61 @@ func ResolveAndValidatePath(absBasePath, relativePath string) (string, error) {
 	}
 
 	return resolvedPath, nil
+}
+
+// IsURLAllowedByOrigins reports whether rawURL falls under one of the allowed origins.
+// Scheme, host and port must match exactly. If an allowed origin has a path, rawURL must be
+// at or below that path. URLs with user info are always rejected.
+func IsURLAllowedByOrigins(rawURL string, allowedOrigins []string) bool {
+	target, err := url.Parse(rawURL)
+	if err != nil || target.User != nil || target.Host == "" {
+		return false
+	}
+
+	for _, origin := range allowedOrigins {
+		allowed, err := url.Parse(origin)
+		if err != nil || allowed.User != nil || allowed.Host == "" {
+			continue
+		}
+
+		if isSameOrigin(target, allowed) && isUnderPath(target.Path, allowed.Path) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func isSameOrigin(a, b *url.URL) bool {
+	return strings.EqualFold(a.Scheme, b.Scheme) &&
+		strings.EqualFold(a.Hostname(), b.Hostname()) &&
+		portOrDefault(a) == portOrDefault(b)
+}
+
+func portOrDefault(u *url.URL) string {
+	if port := u.Port(); port != "" {
+		return port
+	}
+
+	switch strings.ToLower(u.Scheme) {
+	case "http":
+		return "80"
+	case "https":
+		return "443"
+	}
+
+	return ""
+}
+
+func isUnderPath(targetPath, allowedPath string) bool {
+	allowedPath = strings.TrimSuffix(path.Clean("/"+allowedPath), "/")
+	if allowedPath == "" {
+		return true
+	}
+
+	targetPath = path.Clean("/" + targetPath)
+
+	return targetPath == allowedPath || strings.HasPrefix(targetPath, allowedPath+"/")
 }
 
 func TruncateStringWithEllipsis(input string, maxSize int) string {

@@ -157,20 +157,28 @@ func (hf *Hoverfly) readResponseBodyFiles(pairs []v2.RequestMatcherResponsePairV
 	return result
 }
 
-func (hf *Hoverfly) readResponseBodyURL(fileURL string) (string, error) {
-	isAllowed := false
-	for _, allowedOrigin := range hf.Cfg.ResponsesBodyFilesAllowedOrigins {
-		if strings.HasPrefix(fileURL, allowedOrigin) {
-			isAllowed = true
-			break
-		}
-	}
+const maxBodyFileRedirects = 10
 
-	if !isAllowed {
+func (hf *Hoverfly) readResponseBodyURL(fileURL string) (string, error) {
+	allowedOrigins := hf.Cfg.ResponsesBodyFilesAllowedOrigins
+
+	if !util.IsURLAllowedByOrigins(fileURL, allowedOrigins) {
 		return "", fmt.Errorf("bodyFile %s is not allowed. To allow this origin run hoverfly with -response-body-files-allow-origin", fileURL)
 	}
 
-	resp, err := http.DefaultClient.Get(fileURL)
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			if len(via) >= maxBodyFileRedirects {
+				return fmt.Errorf("stopped after %d redirects", maxBodyFileRedirects)
+			}
+			if !util.IsURLAllowedByOrigins(req.URL.String(), allowedOrigins) {
+				return fmt.Errorf("redirect to %s is not allowed", req.URL)
+			}
+			return nil
+		},
+	}
+
+	resp, err := client.Get(fileURL)
 	if err != nil {
 		err := fmt.Errorf("bodyFile %s cannot be downloaded: %s", fileURL, err.Error())
 		return "", err

@@ -417,6 +417,41 @@ func TestResolveAndValidatePath(t *testing.T) {
 	}
 }
 
+func TestIsURLAllowedByOrigins(t *testing.T) {
+	RegisterTestingT(t)
+
+	tests := []struct {
+		name     string
+		url      string
+		origins  []string
+		expected bool
+	}{
+		{"exact origin", "http://localhost/file.json", []string{"http://localhost"}, true},
+		{"origin with trailing slash", "http://localhost/file.json", []string{"http://localhost/"}, true},
+		{"explicit default port", "http://localhost:80/file.json", []string{"http://localhost"}, true},
+		{"case insensitive scheme and host", "HTTP://LocalHost/file.json", []string{"http://localhost"}, true},
+		{"second origin matches", "https://example.com/file.json", []string{"http://localhost", "https://example.com"}, true},
+		{"under allowed path", "https://raw.githubusercontent.com/SpectoLabs/hoverfly/schema.json", []string{"https://raw.githubusercontent.com/SpectoLabs/"}, true},
+		{"no origins", "http://localhost/file.json", nil, false},
+		{"user info bypass", "http://localhost@127.0.0.1:9002/secret", []string{"http://localhost"}, false},
+		{"user info with password", "http://localhost:x@127.0.0.1/secret", []string{"http://localhost"}, false},
+		{"host suffix bypass", "http://localhost.evil.com/file.json", []string{"http://localhost"}, false},
+		{"different port", "http://localhost:9002/file.json", []string{"http://localhost"}, false},
+		{"different scheme", "https://localhost/file.json", []string{"http://localhost"}, false},
+		{"sibling path", "https://raw.githubusercontent.com/SpectoLabsEvil/file.json", []string{"https://raw.githubusercontent.com/SpectoLabs"}, false},
+		{"path traversal", "https://raw.githubusercontent.com/SpectoLabs/../evil/file.json", []string{"https://raw.githubusercontent.com/SpectoLabs/"}, false},
+		{"encoded path traversal", "https://raw.githubusercontent.com/SpectoLabs/%2e%2e/evil/file.json", []string{"https://raw.githubusercontent.com/SpectoLabs/"}, false},
+		{"origin without scheme is ignored", "http://localhost/file.json", []string{"localhost"}, false},
+		{"unparsable url", "http://local host/file.json", []string{"http://localhost"}, false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			Expect(IsURLAllowedByOrigins(test.url, test.origins)).To(Equal(test.expected))
+		})
+	}
+}
+
 func TestTruncateStringWithEllipsis(t *testing.T) {
 
 	tests := []struct {
