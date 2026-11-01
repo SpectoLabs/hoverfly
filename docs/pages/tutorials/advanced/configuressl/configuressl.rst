@@ -47,4 +47,4 @@ Two-way SSL authentication is only enabled for request hosts that match the valu
     hoverctl start --client-authentication-client-cert cert.pem --client-authentication-client-key key.pem --client-authentication-destination <host name of the remote server>
 
 
-If you need to provide a CA cert, you can do so using the ``--client-authentication-ca-cert`` flag.
+If the remote server's certificate is signed by a private CA, you can provide the CA cert using the ``--client-authentication-ca-cert`` flag. Otherwise Hoverfly verifies the remote server against the system's trusted root CAs. As with other upstream requests, verification can be turned off with ``--disable-tls`` (or ``-tls-verification=false`` when running hoverfly directly).
