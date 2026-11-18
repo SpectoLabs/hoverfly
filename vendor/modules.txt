@@ -83,14 +83,14 @@ github.com/gabriel-vasile/mimetype/internal/magic
 github.com/gabriel-vasile/mimetype/internal/markup
 github.com/gabriel-vasile/mimetype/internal/mp3
 github.com/gabriel-vasile/mimetype/internal/scan
-# github.com/go-playground/locales v0.14.1
+# github.com/go-playground/locales v0.14.2
 ## explicit; go 1.17
 github.com/go-playground/locales
 github.com/go-playground/locales/currency
-# github.com/go-playground/universal-translator v0.18.1
-## explicit; go 1.18
+# github.com/go-playground/universal-translator v0.18.2
+## explicit; go 1.26
 github.com/go-playground/universal-translator
-# github.com/go-playground/validator/v10 v10.30.5
+# github.com/go-playground/validator/v10 v10.30.6
 ## explicit; go 1.26.0
 github.com/go-playground/validator/v10
 # github.com/go-viper/mapstructure/v2 v2.4.0
@@ -276,7 +276,7 @@ github.com/spf13/cast/internal
 # github.com/spf13/cobra v1.10.2
 ## explicit; go 1.15
 github.com/spf13/cobra
-# github.com/spf13/pflag v1.0.10
+# github.com/spf13/pflag v1.1.0
 ## explicit; go 1.12
 github.com/spf13/pflag
 # github.com/spf13/viper v1.21.0
@@ -290,12 +290,12 @@ github.com/spf13/viper/internal/features
 # github.com/subosito/gotenv v1.6.0
 ## explicit; go 1.18
 github.com/subosito/gotenv
-# github.com/tdewolff/minify/v2 v2.24.21
+# github.com/tdewolff/minify/v2 v2.25.0
 ## explicit; go 1.26.0
 github.com/tdewolff/minify/v2
 github.com/tdewolff/minify/v2/json
 github.com/tdewolff/minify/v2/xml
-# github.com/tdewolff/parse/v2 v2.8.18
+# github.com/tdewolff/parse/v2 v2.25.0
 ## explicit; go 1.19
 github.com/tdewolff/parse/v2
 github.com/tdewolff/parse/v2/buffer
@@ -314,28 +314,28 @@ github.com/xeipuuv/gojsonschema
 # go.yaml.in/yaml/v3 v3.0.5
 ## explicit; go 1.16
 go.yaml.in/yaml/v3
-# golang.org/x/crypto v0.58.0
+# golang.org/x/crypto v0.59.0
 ## explicit; go 1.26.0
 golang.org/x/crypto/bcrypt
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/sha3
-# golang.org/x/net v0.60.0
+# golang.org/x/net v0.63.0
 ## explicit; go 1.26.0
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/html/charset
 golang.org/x/net/internal/socks
 golang.org/x/net/proxy
-# golang.org/x/sys v0.49.0
+# golang.org/x/sys v0.50.0
 ## explicit; go 1.26.0
 golang.org/x/sys/cpu
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/term v0.47.0
+# golang.org/x/term v0.48.0
 ## explicit; go 1.26.0
 golang.org/x/term
-# golang.org/x/text v0.43.0
+# golang.org/x/text v0.44.0
 ## explicit; go 1.26.0
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
@@ -400,7 +400,7 @@ gopkg.in/tomb.v1
 # gopkg.in/yaml.v2 v2.4.0
 ## explicit; go 1.15
 gopkg.in/yaml.v2
-# k8s.io/client-go v0.37.1
+# k8s.io/client-go v0.37.2
 ## explicit; go 1.26.0
 k8s.io/client-go/third_party/forked/golang/template
 k8s.io/client-go/util/jsonpath

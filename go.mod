@@ -15,7 +15,7 @@ require (
 	github.com/codegangsta/negroni v1.0.0
 	github.com/dghubble/sling v1.4.2
 	github.com/dsnet/compress v0.0.1
-	github.com/go-playground/validator/v10 v10.30.5
+	github.com/go-playground/validator/v10 v10.30.6
 	github.com/go-zoo/bone v1.3.0
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/gorilla/mux v1.8.1
@@ -35,15 +35,15 @@ require (
 	github.com/ryanuber/go-glob v1.0.0
 	github.com/sirupsen/logrus v1.10.2
 	github.com/spf13/cobra v1.10.2
-	github.com/spf13/pflag v1.0.10
+	github.com/spf13/pflag v1.1.0
 	github.com/spf13/viper v1.21.0
-	github.com/tdewolff/minify/v2 v2.24.21
+	github.com/tdewolff/minify/v2 v2.25.0
 	github.com/xeipuuv/gojsonschema v1.2.0
-	golang.org/x/crypto v0.58.0
-	golang.org/x/term v0.47.0
+	golang.org/x/crypto v0.59.0
+	golang.org/x/term v0.48.0
 	gonum.org/v1/gonum v0.17.0
 	gopkg.in/yaml.v2 v2.4.0
-	k8s.io/client-go v0.37.1
+	k8s.io/client-go v0.37.2
 )
 
 require (
@@ -55,8 +55,8 @@ require (
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.16 // indirect
-	github.com/go-playground/locales v0.14.1 // indirect
-	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/go-playground/locales v0.14.2 // indirect
+	github.com/go-playground/universal-translator v0.18.2 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/goccmack/goutil v1.2.3 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
@@ -79,13 +79,13 @@ require (
 	github.com/spf13/afero v1.15.0 // indirect
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/tdewolff/parse/v2 v2.8.18 // indirect
+	github.com/tdewolff/parse/v2 v2.25.0 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/net v0.60.0 // indirect
-	golang.org/x/sys v0.49.0 // indirect
-	golang.org/x/text v0.43.0 // indirect
+	golang.org/x/net v0.63.0 // indirect
+	golang.org/x/sys v0.50.0 // indirect
+	golang.org/x/text v0.44.0 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
